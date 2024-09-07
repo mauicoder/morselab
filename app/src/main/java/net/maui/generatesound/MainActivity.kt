@@ -18,21 +18,21 @@ class MainActivity : AppCompatActivity() {
 
     private var frequency = 800
     private var wpm = 20
-    private var farnsworthWpm = 10
+    private var farnsworthWpm = 20
 
     // Morse code map for letters, numbers, and some symbols
     val morseCodeMap = mapOf(
-        'A' to ".-",    'B' to "-...",  'C' to "-.-.",  'D' to "-..",   'E' to ".",
-        'F' to "..-.",  'G' to "--.",   'H' to "....",  'I' to "..",    'J' to ".---",
-        'K' to "-.-",   'L' to ".-..",  'M' to "--",    'N' to "-.",    'O' to "---",
-        'P' to ".--.",  'Q' to "--.-",  'R' to ".-.",   'S' to "...",   'T' to "-",
-        'U' to "..-",   'V' to "...-",  'W' to ".--",   'X' to "-..-",  'Y' to "-.--",
+        'A' to ".-", 'B' to "-...", 'C' to "-.-.", 'D' to "-..", 'E' to ".",
+        'F' to "..-.", 'G' to "--.", 'H' to "....", 'I' to "..", 'J' to ".---",
+        'K' to "-.-", 'L' to ".-..", 'M' to "--", 'N' to "-.", 'O' to "---",
+        'P' to ".--.", 'Q' to "--.-", 'R' to ".-.", 'S' to "...", 'T' to "-",
+        'U' to "..-", 'V' to "...-", 'W' to ".--", 'X' to "-..-", 'Y' to "-.--",
         'Z' to "--..",
         '1' to ".----", '2' to "..---", '3' to "...--", '4' to "....-", '5' to ".....",
         '6' to "-....", '7' to "--...", '8' to "---..", '9' to "----.", '0' to "-----",
         '.' to ".-.-.-", ',' to "--..--", '?' to "..--..", '\'' to ".----.", '!' to "-.-.--",
-        '/' to "-..-.",  '(' to "-.--.",  ')' to "-.--.-", '&' to ".-...",  ':' to "---...",
-        ';' to "-.-.-.", '=' to "-...-",  '+' to ".-.-.",  '-' to "-....-", '_' to "..--.-",
+        '/' to "-..-.", '(' to "-.--.", ')' to "-.--.-", '&' to ".-...", ':' to "---...",
+        ';' to "-.-.-.", '=' to "-...-", '+' to ".-.-.", '-' to "-....-", '_' to "..--.-",
         '"' to ".-..-.", '$' to "...-..-", '@' to ".--.-."
     )
 
@@ -54,36 +54,46 @@ class MainActivity : AppCompatActivity() {
         val buttonPlay: Button = findViewById(R.id.buttonPlay)
 
         buttonIncreaseFrequency.setOnClickListener {
-            frequency += 100
+            frequency += 50
             textViewFrequency.text = "Frequency (Hz): $frequency"
         }
 
         buttonDecreaseFrequency.setOnClickListener {
-            frequency -= 100
+            frequency -= 50
             if (frequency < 100) frequency = 100
             textViewFrequency.text = "Frequency (Hz): $frequency"
         }
 
         buttonIncreaseWPM.setOnClickListener {
-            wpm += 5
-            textViewWPM.text = "WPM: $wpm"
+            wpm += 1
+            updateWPMText()
         }
 
         buttonDecreaseWPM.setOnClickListener {
-            wpm -= 5
+            wpm -= 1
             if (wpm < 5) wpm = 5
-            textViewWPM.text = "WPM: $wpm"
+            updateWPMText()
+            if (farnsworthWpm > wpm) {
+                farnsworthWpm = wpm
+                updateFarnsworthText()
+            }
         }
 
         buttonIncreaseFarnsworthWPM.setOnClickListener {
-            farnsworthWpm += 5
-            textViewFarnsworthWPM.text = "Farnsworth WPM: $farnsworthWpm"
+            farnsworthWpm += 1
+            updateFarnsworthText()
+
+            if (farnsworthWpm > wpm) {
+                 wpm = farnsworthWpm
+                updateWPMText()
+            }
         }
 
         buttonDecreaseFarnsworthWPM.setOnClickListener {
-            farnsworthWpm -= 5
+            farnsworthWpm -= 1
             if (farnsworthWpm < 5) farnsworthWpm = 5
-            textViewFarnsworthWPM.text = "Farnsworth WPM: $farnsworthWpm"
+            updateFarnsworthText()
+
         }
 
         buttonPlay.setOnClickListener {
@@ -93,7 +103,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun generateSineWave(frequency: Int, durationMs: Int, sampleRate: Int, fadeDurationMs: Int = 20): ByteArray {
+    private fun updateWPMText() {
+        textViewWPM.text = "WPM: $wpm"
+    }
+
+    private fun updateFarnsworthText() {
+        textViewFarnsworthWPM.text = "Farnsworth WPM: $farnsworthWpm"
+    }
+
+    private fun generateSineWave(
+        frequency: Int,
+        durationMs: Int,
+        sampleRate: Int,
+        fadeDurationMs: Int = 20
+    ): ByteArray {
         val numSamples = (sampleRate * (durationMs / 1000.0)).toInt()
         val fadeSamples = (sampleRate * (fadeDurationMs / 1000.0)).toInt()
         val sample = ByteArray(numSamples)
@@ -156,7 +179,13 @@ class MainActivity : AppCompatActivity() {
         return 1200 / wpm
     }
 
-    private fun encodeMorse(text: String, wpm: Int, farnsworthWpm: Int, frequency: Int, sampleRate: Int): ByteArray {
+    private fun encodeMorse(
+        text: String,
+        wpm: Int,
+        farnsworthWpm: Int,
+        frequency: Int,
+        sampleRate: Int
+    ): ByteArray {
         val dotDuration = morseTiming(wpm)
         val dashDuration = 3 * dotDuration
         val intraCharacterPause = ByteArray(dotDuration * sampleRate / 1000)
@@ -174,8 +203,21 @@ class MainActivity : AppCompatActivity() {
                     val morseCode = morseCodeMap[char] ?: return@forEach
                     morseCode.forEach { symbol ->
                         when (symbol) {
-                            '.' -> morseSoundList.add(generateSineWave(frequency, dotDuration, sampleRate))
-                            '-' -> morseSoundList.add(generateSineWave(frequency, dashDuration, sampleRate))
+                            '.' -> morseSoundList.add(
+                                generateSineWave(
+                                    frequency,
+                                    dotDuration,
+                                    sampleRate
+                                )
+                            )
+
+                            '-' -> morseSoundList.add(
+                                generateSineWave(
+                                    frequency,
+                                    dashDuration,
+                                    sampleRate
+                                )
+                            )
                         }
                         morseSoundList.add(intraCharacterPause) // Pause between dots and dashes within a character
                     }
