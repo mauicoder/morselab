@@ -9,4 +9,5 @@
     <string name="farnsworth_wpm">Farnsworth WPM: 20</string>
     <string name="play">Play</string>
     <string name="default_text">Hello</string>
+    <string name="export">Export</string>
 </resources>

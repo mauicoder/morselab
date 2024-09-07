@@ -92,4 +92,15 @@
         android:layout_below="@id/buttonIncreaseFarnsworthWPM"
         android:layout_marginTop="35dp"
         android:text="@string/play" />
+
+    <Button
+        android:id="@+id/buttonExport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonIncreaseFarnsworthWPM"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="34dp"
+        android:layout_toEndOf="@id/buttonPlay"
+        android:onClick="exportAsWave"
+        android:text="@string/export" />
 </RelativeLayout>

@@ -1,15 +1,30 @@
 package net.maui.generatesound
 
+import android.content.Context
+import android.content.Intent
 import android.media.AudioFormat
 import android.media.AudioTrack
 import android.os.Bundle
+import android.os.Environment
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.PrintWriter
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import kotlin.math.sin
 
 class MainActivity : AppCompatActivity() {
+
+    private var SAMPLE_RATE = 44100
+    private val FILE_PROVIDER_AUTHORITY = "net.maui.generatesound.provider"
+    private val FILE_PROVIDER_NAME = "shared_data.wav"
 
     private lateinit var editTextText: EditText
     private lateinit var textViewFrequency: TextView
@@ -21,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private var farnsworthWpm = 20
 
     // Morse code map for letters, numbers, and some symbols
-    val morseCodeMap = mapOf(
+    private val morseCodeMap = mapOf(
         'A' to ".-", 'B' to "-...", 'C' to "-.-.", 'D' to "-..", 'E' to ".",
         'F' to "..-.", 'G' to "--.", 'H' to "....", 'I' to "..", 'J' to ".---",
         'K' to "-.-", 'L' to ".-..", 'M' to "--", 'N' to "-.", 'O' to "---",
@@ -98,8 +113,8 @@ class MainActivity : AppCompatActivity() {
 
         buttonPlay.setOnClickListener {
             val text = editTextText.text.toString()
-            val morseCodeSound = encodeMorse(text, wpm, farnsworthWpm, frequency, 44100)
-            playSound(morseCodeSound, 44100)
+            val morseCodeSound = encodeMorse(text, wpm, farnsworthWpm, frequency, SAMPLE_RATE)
+            playSound(morseCodeSound, SAMPLE_RATE)
         }
     }
 
@@ -227,5 +242,69 @@ class MainActivity : AppCompatActivity() {
         }
 
         return concatenateSounds(*morseSoundList.toTypedArray())
+    }
+
+    private fun File.clearText() {
+        PrintWriter(this).also {
+            it.print("")
+            it.close()
+        }
+    }
+
+    private fun File.updateText(content: ByteArray) {
+        clearText()
+        appendBytes(content)
+    }
+
+    private fun shareFile(waveStream: ByteArray) {
+        val application = this
+        val file = File(application.cacheDir, FILE_PROVIDER_NAME)
+
+        file.updateText(waveStream)
+
+        val uri = FileProvider.getUriForFile(this, FILE_PROVIDER_AUTHORITY, file)
+
+        Intent(Intent.ACTION_SEND).apply {
+            type = "audio/*"
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            putExtra(Intent.EXTRA_STREAM, uri)
+        }.also { intent ->
+            startActivity(Intent.createChooser(intent, "Share Sound File"))
+        }
+    }
+
+    private fun createWavHeader(dataSize: Int, sampleRate: Int): ByteArray {
+        val totalDataLen = dataSize + 36
+        val byteRate = sampleRate * 1 * 8 / 8 // sampleRate * numChannels * bitsPerSample/8
+
+        val header = ByteArray(44)
+        val buffer = ByteBuffer.wrap(header).order(ByteOrder.LITTLE_ENDIAN)
+
+        buffer.put("RIFF".toByteArray())             // RIFF header
+        buffer.putInt(totalDataLen)                  // Total size of the file minus 8 bytes
+        buffer.put("WAVE".toByteArray())             // WAVE type
+        buffer.put("fmt ".toByteArray())             // Format chunk marker
+        buffer.putInt(16)                            // Length of format data
+        buffer.putShort(1)                           // PCM format
+        buffer.putShort(1)                           // Number of channels (1 for mono)
+        buffer.putInt(sampleRate)                    // Sample rate
+        buffer.putInt(byteRate)                      // Byte rate
+        buffer.putShort(1)                           // Block align (numChannels * bitsPerSample/8)
+        buffer.putShort(8)                           // Bits per sample (8 bits)
+
+        buffer.put("data".toByteArray())             // Data chunk header
+        buffer.putInt(dataSize)                      // Size of data section
+
+        return header
+    }
+
+    fun exportAsWave(view: View) {
+        val text = editTextText.text.toString()
+        val morseCodeSound = encodeMorse(text, wpm, farnsworthWpm, frequency, SAMPLE_RATE)
+
+        val waveStream = createWavHeader(morseCodeSound.size, SAMPLE_RATE)
+
+        shareFile(waveStream + morseCodeSound)
     }
 }
