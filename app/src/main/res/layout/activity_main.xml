@@ -11,34 +11,79 @@
         android:hint="Enter text"
         android:inputType="text" />
 
-    <EditText
-        android:id="@+id/editTextFrequency"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/textViewFrequency"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/editTextText"
-        android:hint="Frequency (Hz)"
-        android:inputType="number" />
+        android:text="Frequency (Hz): 800"
+        android:textSize="18sp" />
 
-    <EditText
-        android:id="@+id/editTextWPM"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/buttonIncreaseFrequency"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editTextFrequency"
-        android:hint="WPM"
-        android:inputType="number" />
+        android:layout_below="@id/textViewFrequency"
+        android:text="Increase Frequency" />
 
-    <EditText
-        android:id="@+id/editTextFarnsworthWPM"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/buttonDecreaseFrequency"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editTextWPM"
-        android:hint="Farnsworth WPM"
-        android:inputType="number" />
+        android:layout_toEndOf="@id/buttonIncreaseFrequency"
+        android:layout_below="@id/textViewFrequency"
+        android:text="Decrease Frequency" />
+
+    <TextView
+        android:id="@+id/textViewWPM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonIncreaseFrequency"
+        android:text="WPM: 20"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/buttonIncreaseWPM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewWPM"
+        android:text="Increase WPM" />
+
+    <Button
+        android:id="@+id/buttonDecreaseWPM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/buttonIncreaseWPM"
+        android:layout_below="@id/textViewWPM"
+        android:text="Decrease WPM" />
+
+    <TextView
+        android:id="@+id/textViewFarnsworthWPM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonIncreaseWPM"
+        android:text="Farnsworth WPM: 10"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/buttonIncreaseFarnsworthWPM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewFarnsworthWPM"
+        android:text="Increase Farnsworth WPM" />
+
+    <Button
+        android:id="@+id/buttonDecreaseFarnsworthWPM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/buttonIncreaseFarnsworthWPM"
+        android:layout_below="@id/textViewFarnsworthWPM"
+        android:text="Decrease Farnsworth WPM" />
 
     <Button
         android:id="@+id/buttonPlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editTextFarnsworthWPM"
+        android:layout_below="@id/buttonIncreaseFarnsworthWPM"
         android:text="Play" />
 </RelativeLayout>

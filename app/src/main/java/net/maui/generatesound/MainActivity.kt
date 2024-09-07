@@ -5,16 +5,20 @@ import android.media.AudioTrack
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import kotlin.math.sin
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var editTextText: EditText
-    private lateinit var editTextFrequency: EditText
-    private lateinit var editTextWPM: EditText
-    private lateinit var editTextFarnsworthWPM: EditText
-    private lateinit var buttonPlay: Button
+    private lateinit var textViewFrequency: TextView
+    private lateinit var textViewWPM: TextView
+    private lateinit var textViewFarnsworthWPM: TextView
+
+    private var frequency = 800
+    private var wpm = 20
+    private var farnsworthWpm = 10
 
     // Morse code map for letters, numbers, and some symbols
     val morseCodeMap = mapOf(
@@ -37,17 +41,53 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         editTextText = findViewById(R.id.editTextText)
-        editTextFrequency = findViewById(R.id.editTextFrequency)
-        editTextWPM = findViewById(R.id.editTextWPM)
-        editTextFarnsworthWPM = findViewById(R.id.editTextFarnsworthWPM)
-        buttonPlay = findViewById(R.id.buttonPlay)
+        textViewFrequency = findViewById(R.id.textViewFrequency)
+        textViewWPM = findViewById(R.id.textViewWPM)
+        textViewFarnsworthWPM = findViewById(R.id.textViewFarnsworthWPM)
+
+        val buttonIncreaseFrequency: Button = findViewById(R.id.buttonIncreaseFrequency)
+        val buttonDecreaseFrequency: Button = findViewById(R.id.buttonDecreaseFrequency)
+        val buttonIncreaseWPM: Button = findViewById(R.id.buttonIncreaseWPM)
+        val buttonDecreaseWPM: Button = findViewById(R.id.buttonDecreaseWPM)
+        val buttonIncreaseFarnsworthWPM: Button = findViewById(R.id.buttonIncreaseFarnsworthWPM)
+        val buttonDecreaseFarnsworthWPM: Button = findViewById(R.id.buttonDecreaseFarnsworthWPM)
+        val buttonPlay: Button = findViewById(R.id.buttonPlay)
+
+        buttonIncreaseFrequency.setOnClickListener {
+            frequency += 100
+            textViewFrequency.text = "Frequency (Hz): $frequency"
+        }
+
+        buttonDecreaseFrequency.setOnClickListener {
+            frequency -= 100
+            if (frequency < 100) frequency = 100
+            textViewFrequency.text = "Frequency (Hz): $frequency"
+        }
+
+        buttonIncreaseWPM.setOnClickListener {
+            wpm += 5
+            textViewWPM.text = "WPM: $wpm"
+        }
+
+        buttonDecreaseWPM.setOnClickListener {
+            wpm -= 5
+            if (wpm < 5) wpm = 5
+            textViewWPM.text = "WPM: $wpm"
+        }
+
+        buttonIncreaseFarnsworthWPM.setOnClickListener {
+            farnsworthWpm += 5
+            textViewFarnsworthWPM.text = "Farnsworth WPM: $farnsworthWpm"
+        }
+
+        buttonDecreaseFarnsworthWPM.setOnClickListener {
+            farnsworthWpm -= 5
+            if (farnsworthWpm < 5) farnsworthWpm = 5
+            textViewFarnsworthWPM.text = "Farnsworth WPM: $farnsworthWpm"
+        }
 
         buttonPlay.setOnClickListener {
             val text = editTextText.text.toString()
-            val frequency = editTextFrequency.text.toString().toIntOrNull() ?: 800
-            val wpm = editTextWPM.text.toString().toIntOrNull() ?: 20
-            val farnsworthWpm = editTextFarnsworthWPM.text.toString().toIntOrNull() ?: 10
-
             val morseCodeSound = encodeMorse(text, wpm, farnsworthWpm, frequency, 44100)
             playSound(morseCodeSound, 44100)
         }
