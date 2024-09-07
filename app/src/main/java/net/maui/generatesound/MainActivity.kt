@@ -196,7 +196,7 @@ class MainActivity : AppCompatActivity() {
 
         val morseSoundList = mutableListOf<ByteArray>()
 
-        text.toUpperCase().forEach { char ->
+        text.uppercase().forEach { char ->
             when (char) {
                 ' ' -> morseSoundList.add(interWordPause) // Space between words
                 else -> {
