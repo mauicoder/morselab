@@ -3,15 +3,18 @@ package net.maui.generatesound
 import android.media.AudioFormat
 import android.media.AudioTrack
 import android.os.Bundle
-import android.view.View
-import androidx.activity.enableEdgeToEdge
+import android.widget.Button
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import kotlin.math.sin
 
-
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var editTextText: EditText
+    private lateinit var editTextFrequency: EditText
+    private lateinit var editTextWPM: EditText
+    private lateinit var editTextFarnsworthWPM: EditText
+    private lateinit var buttonPlay: Button
 
     // Morse code map for letters, numbers, and some symbols
     val morseCodeMap = mapOf(
@@ -29,7 +32,28 @@ class MainActivity : AppCompatActivity() {
         '"' to ".-..-.", '$' to "...-..-", '@' to ".--.-."
     )
 
-    fun generateSineWave(frequency: Int, durationMs: Int, sampleRate: Int, fadeDurationMs: Int = 20): ByteArray {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        editTextText = findViewById(R.id.editTextText)
+        editTextFrequency = findViewById(R.id.editTextFrequency)
+        editTextWPM = findViewById(R.id.editTextWPM)
+        editTextFarnsworthWPM = findViewById(R.id.editTextFarnsworthWPM)
+        buttonPlay = findViewById(R.id.buttonPlay)
+
+        buttonPlay.setOnClickListener {
+            val text = editTextText.text.toString()
+            val frequency = editTextFrequency.text.toString().toIntOrNull() ?: 800
+            val wpm = editTextWPM.text.toString().toIntOrNull() ?: 20
+            val farnsworthWpm = editTextFarnsworthWPM.text.toString().toIntOrNull() ?: 10
+
+            val morseCodeSound = encodeMorse(text, wpm, farnsworthWpm, frequency, 44100)
+            playSound(morseCodeSound, 44100)
+        }
+    }
+
+    private fun generateSineWave(frequency: Int, durationMs: Int, sampleRate: Int, fadeDurationMs: Int = 20): ByteArray {
         val numSamples = (sampleRate * (durationMs / 1000.0)).toInt()
         val fadeSamples = (sampleRate * (fadeDurationMs / 1000.0)).toInt()
         val sample = ByteArray(numSamples)
@@ -50,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         return sample
     }
 
-    fun concatenateSounds(vararg sounds: ByteArray): ByteArray {
+    private fun concatenateSounds(vararg sounds: ByteArray): ByteArray {
         val totalLength = sounds.sumOf { it.size }
         val result = ByteArray(totalLength)
         var offset = 0
@@ -61,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         return result
     }
 
-    fun playSound(soundData: ByteArray, sampleRate: Int) {
+    private fun playSound(soundData: ByteArray, sampleRate: Int) {
         val audioTrack = AudioTrack.Builder()
             .setAudioAttributes(
                 android.media.AudioAttributes.Builder()
@@ -88,11 +112,11 @@ class MainActivity : AppCompatActivity() {
         audioTrack.release()
     }
 
-    fun morseTiming(wpm: Int): Int {
+    private fun morseTiming(wpm: Int): Int {
         return 1200 / wpm
     }
 
-    fun encodeMorse(text: String, wpm: Int, farnsworthWpm: Int, frequency: Int, sampleRate: Int): ByteArray {
+    private fun encodeMorse(text: String, wpm: Int, farnsworthWpm: Int, frequency: Int, sampleRate: Int): ByteArray {
         val dotDuration = morseTiming(wpm)
         val dashDuration = 3 * dotDuration
         val intraCharacterPause = ByteArray(dotDuration * sampleRate / 1000)
@@ -121,38 +145,5 @@ class MainActivity : AppCompatActivity() {
         }
 
         return concatenateSounds(*morseSoundList.toTypedArray())
-    }
-
-    fun playA() {
-        val sampleRate = 44100
-        val wpm = 20 // Words per minute (Character speed)
-        val farnsworthWpm = 10 // Farnsworth Words per minute (Overall speed)
-        val frequency = 800 // Frequency of the tone in Hz
-
-        // Example text to encode and play in Morse code
-        val text = "HELLO WORLD"
-
-        // Encode the text into Morse code sound using Farnsworth timing
-        val morseCodeSound = encodeMorse(text, wpm, farnsworthWpm, frequency, sampleRate)
-
-        // Play the concatenated sound
-        playSound(morseCodeSound, sampleRate)
-    }
-
-
-    fun playClickCallBack(view: View) {
-        // Use a new tread as this can take a while
-        playA()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
     }
 }
