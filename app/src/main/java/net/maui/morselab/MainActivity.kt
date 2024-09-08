@@ -1,20 +1,20 @@
 package net.maui.morselab
 
-import android.content.Context
 import android.content.Intent
 import android.media.AudioFormat
 import android.media.AudioTrack
 import android.os.Bundle
-import android.os.Environment
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 import java.io.PrintWriter
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -22,7 +22,7 @@ import kotlin.math.sin
 
 class MainActivity : AppCompatActivity() {
 
-    private var SAMPLE_RATE = 44100
+    private val SAMPLE_RATE = 44100
     private val FILE_PROVIDER_AUTHORITY = "net.maui.morselab.provider"
     private val FILE_PROVIDER_NAME = "shared_data.wav"
 
@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textViewWPM: TextView
     private lateinit var textViewFarnsworthWPM: TextView
 
+    private var playJob: Job? = null
     private var frequency = 800
     private var wpm = 20
     private var farnsworthWpm = 20
@@ -66,7 +67,6 @@ class MainActivity : AppCompatActivity() {
         val buttonDecreaseWPM: Button = findViewById(R.id.buttonDecreaseWPM)
         val buttonIncreaseFarnsworthWPM: Button = findViewById(R.id.buttonIncreaseFarnsworthWPM)
         val buttonDecreaseFarnsworthWPM: Button = findViewById(R.id.buttonDecreaseFarnsworthWPM)
-        val buttonPlay: Button = findViewById(R.id.buttonPlay)
 
         buttonIncreaseFrequency.setOnClickListener {
             frequency += 50
@@ -111,11 +111,27 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        buttonPlay.setOnClickListener {
-            val text = editTextText.text.toString()
+    }
+
+    fun playMorseCallback(view: View) {
+        if (playJob != null && playJob!!.isActive)
+            return //ignore as a playJob is already running
+        playJob = CoroutineScope(context = Dispatchers.Default).launch {
+            playMorse()
+        }
+    }
+
+    private fun playMorse() {
+        val text = editTextText.text.toString()
+        val morseCodeSound = encodeMorse(text, wpm, farnsworthWpm, frequency, SAMPLE_RATE)
+        playSound(morseCodeSound, SAMPLE_RATE)
+
+/*
+        withContext(Dispatchers.Default) {
             val morseCodeSound = encodeMorse(text, wpm, farnsworthWpm, frequency, SAMPLE_RATE)
             playSound(morseCodeSound, SAMPLE_RATE)
         }
+*/
     }
 
     private fun updateWPMText() {

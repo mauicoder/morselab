@@ -91,6 +91,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/buttonIncreaseFarnsworthWPM"
         android:layout_marginTop="35dp"
+        android:onClick="playMorseCallback"
         android:text="@string/play" />
 
     <Button
