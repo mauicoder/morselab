@@ -125,13 +125,6 @@ class MainActivity : AppCompatActivity() {
         val text = editTextText.text.toString()
         val morseCodeSound = encodeMorse(text, wpm, farnsworthWpm, frequency, SAMPLE_RATE)
         playSound(morseCodeSound, SAMPLE_RATE)
-
-/*
-        withContext(Dispatchers.Default) {
-            val morseCodeSound = encodeMorse(text, wpm, farnsworthWpm, frequency, SAMPLE_RATE)
-            playSound(morseCodeSound, SAMPLE_RATE)
-        }
-*/
     }
 
     private fun updateWPMText() {
