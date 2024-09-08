@@ -1,4 +1,4 @@
-package net.maui.generatesound
+package net.maui.morselab
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package net.maui.generatesound
+package net.maui.morselab
 
 import android.content.Context
 import android.content.Intent
@@ -23,7 +23,7 @@ import kotlin.math.sin
 class MainActivity : AppCompatActivity() {
 
     private var SAMPLE_RATE = 44100
-    private val FILE_PROVIDER_AUTHORITY = "net.maui.generatesound.provider"
+    private val FILE_PROVIDER_AUTHORITY = "net.maui.morselab.provider"
     private val FILE_PROVIDER_NAME = "shared_data.wav"
 
     private lateinit var editTextText: EditText

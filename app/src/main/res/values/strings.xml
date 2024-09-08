@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GenerateSound</string>
+    <string name="app_name">MorseLab</string>
     <string name="play_button">Play</string>
     <string name="enter_text">Enter text</string>
     <string name="frequency_hz">Frequency (Hz): 800</string>

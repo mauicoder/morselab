@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "GenerateSound"
+rootProject.name = "MorseLab"
 include(":app")

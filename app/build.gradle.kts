@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "net.maui.generatesound"
+    namespace = "net.maui.morselab"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "net.maui.generatesound"
+        applicationId = "net.maui.morselab"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
