@@ -1,107 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
 
-    <EditText
-        android:id="@+id/editTextText"
+    </data>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/enter_text"
-        android:text="@string/default_text"
-        android:inputType="text" />
+        android:layout_height="match_parent"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/textViewFrequency"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/editTextText"
-        android:layout_marginTop="11dp"
-        android:text="@string/frequency_hz"
-        android:textSize="18sp" />
+        <FrameLayout
+            android:id="@+id/flFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/bottomNavigationView"
+            android:layout_marginBottom="0dp" />
 
-    <Button
-        android:id="@+id/buttonDecreaseFrequency"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textViewFrequency"
-        android:text="@string/decrease" />
-
-    <Button
-        android:id="@+id/buttonIncreaseFrequency"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/buttonDecreaseFrequency"
-        android:layout_below="@id/textViewFrequency"
-        android:text="@string/plus" />
-
-    <TextView
-        android:id="@+id/textViewWPM"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/buttonIncreaseFrequency"
-        android:layout_marginTop="13dp"
-        android:text="@string/wpm_20"
-        android:textSize="18sp" />
-
-    <Button
-        android:id="@+id/buttonDecreaseWPM"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textViewWPM"
-        android:text="@string/decrease" />
-
-    <Button
-        android:id="@+id/buttonIncreaseWPM"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/buttonDecreaseWPM"
-        android:layout_below="@id/textViewWPM"
-        android:text="@string/plus" />
-
-    <TextView
-        android:id="@+id/textViewFarnsworthWPM"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/buttonIncreaseWPM"
-        android:layout_marginTop="18dp"
-        android:text="@string/farnsworth_wpm"
-        android:textSize="18sp" />
-
-    <Button
-        android:id="@+id/buttonDecreaseFarnsworthWPM"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textViewFarnsworthWPM"
-        android:text="@string/decrease" />
-
-    <Button
-        android:id="@+id/buttonIncreaseFarnsworthWPM"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/buttonDecreaseFarnsworthWPM"
-        android:layout_below="@id/textViewFarnsworthWPM"
-        android:layout_marginTop="1dp"
-        android:text="@string/plus" />
-
-    <Button
-        android:id="@+id/buttonPlay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/buttonIncreaseFarnsworthWPM"
-        android:layout_marginTop="35dp"
-        android:onClick="playMorseCallback"
-        android:text="@string/play" />
-
-    <Button
-        android:id="@+id/buttonExport"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/buttonIncreaseFarnsworthWPM"
-        android:layout_marginStart="110dp"
-        android:layout_marginTop="34dp"
-        android:layout_toEndOf="@id/buttonPlay"
-        android:onClick="exportAsWave"
-        android:text="@string/export" />
-</RelativeLayout>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_alignParentBottom="true"
+            app:menu="@menu/bottom_nav_menu" />
+    </RelativeLayout>
+</layout>

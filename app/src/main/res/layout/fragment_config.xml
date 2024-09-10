@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragments.ConfigFragment">
+
+        <TextView
+            android:id="@+id/textViewFrequency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:text="@string/frequency_hz"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/buttonDecreaseFrequency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_below="@id/textViewFrequency"
+            android:text="@string/decrease" />
+
+        <Button
+            android:id="@+id/buttonIncreaseFrequency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewFrequency"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="1dp"
+            android:layout_toEndOf="@id/buttonDecreaseFrequency"
+            android:text="@string/plus" />
+
+        <TextView
+            android:id="@+id/textViewWPM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/buttonIncreaseFrequency"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="13dp"
+            android:text="@string/wpm_20"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/buttonDecreaseWPM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewWPM"
+            android:layout_marginStart="20dp"
+            android:text="@string/decrease" />
+
+        <Button
+            android:id="@+id/buttonIncreaseWPM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewWPM"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="-1dp"
+            android:layout_toEndOf="@id/buttonDecreaseWPM"
+            android:text="@string/plus" />
+
+        <TextView
+            android:id="@+id/textViewFarnsworthWPM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/buttonIncreaseWPM"
+            android:layout_marginTop="18dp"
+            android:layout_marginStart="20dp"
+
+            android:text="@string/farnsworth_wpm"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/buttonDecreaseFarnsworthWPM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_below="@id/textViewFarnsworthWPM"
+            android:text="@string/decrease" />
+
+        <Button
+            android:id="@+id/buttonIncreaseFarnsworthWPM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewFarnsworthWPM"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="1dp"
+            android:layout_toEndOf="@id/buttonDecreaseFarnsworthWPM"
+            android:text="@string/plus" />
+
+    </RelativeLayout>
+</layout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/playTextFragment">
+
+    <fragment
+        android:id="@+id/playTextFragment"
+        android:name="net.maui.morselab.fragments.PlayTextFragment"
+        android:label="PlayTextFragment" >
+        <action
+            android:id="@+id/action_playTextFragment_to_configFragment"
+            app:destination="@id/configFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/configFragment"
+        android:name="net.maui.morselab.fragments.ConfigFragment"
+        android:label="ConfigFragment" >
+        <action
+            android:id="@+id/action_configFragment_to_playTextFragment"
+            app:destination="@id/playTextFragment" />
+    </fragment>
+</navigation>

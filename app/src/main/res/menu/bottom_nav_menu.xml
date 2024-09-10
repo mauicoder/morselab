@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <item
+            android:id="@+id/miPlay"
+            android:title="@string/play_text"
+            android:icon="@drawable/ic_play"/>
+        <item
+            android:id="@+id/miConfig"
+            android:title="@string/config"
+            android:icon="@drawable/ic_settings"/>
+</menu>
