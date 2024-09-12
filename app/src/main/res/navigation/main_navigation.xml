@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/playTextFragment"
-        android:name="net.maui.morselab.fragments.PlayTextFragment"
+        android:name="net.maui.morselab.fragment.PlayTextFragment"
         android:label="PlayTextFragment" >
         <action
             android:id="@+id/action_playTextFragment_to_configFragment"
@@ -14,7 +14,7 @@
     </fragment>
     <fragment
         android:id="@+id/configFragment"
-        android:name="net.maui.morselab.fragments.ConfigFragment"
+        android:name="net.maui.morselab.fragment.ConfigFragment"
         android:label="ConfigFragment" >
         <action
             android:id="@+id/action_configFragment_to_playTextFragment"
