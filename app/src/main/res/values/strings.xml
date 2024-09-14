@@ -2,11 +2,11 @@
     <string name="app_name">MorseLab</string>
     <string name="play_button">Play</string>
     <string name="enter_text">Enter text</string>
-    <string name="frequency_hz">Frequency (Hz): 800</string>
+    <string name="frequency_hz">Frequency (Hz):</string>
     <string name="plus">+</string>
     <string name="decrease">-</string>
-    <string name="wpm_20">WPM: 20</string>
-    <string name="farnsworth_wpm">Farnsworth WPM: 20</string>
+    <string name="wpm">WPM:</string>
+    <string name="farnsworth_wpm">Farnsworth WPM:</string>
     <string name="play">Play</string>
     <string name="default_text">Hello</string>
     <string name="export">Export</string>

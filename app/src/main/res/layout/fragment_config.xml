@@ -2,30 +2,36 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-    </data>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".fragment.ConfigFragment">
 
+        <EditText
+            android:id="@+id/labelFrequency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:text="@string/frequency_hz" />
+
         <TextView
             android:id="@+id/textViewFrequency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_below="@+id/labelFrequency"
             android:layout_marginStart="20dp"
-            android:text="@string/frequency_hz"
+            android:layout_marginTop="20dp"
+            android:text="@{String.valueOf(viewmodel.frequencyFlow)}"
             android:textSize="18sp" />
 
         <Button
             android:id="@+id/buttonDecreaseFrequency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:layout_below="@id/textViewFrequency"
+            android:layout_marginStart="20dp"
+            android:onClick="@{viewmodel.decreaseFrequency}"
             android:text="@string/decrease" />
 
         <Button
@@ -36,16 +42,27 @@
             android:layout_marginStart="60dp"
             android:layout_marginTop="1dp"
             android:layout_toEndOf="@id/buttonDecreaseFrequency"
+            android:onClick="@{viewmodel.increaseFrequency}"
             android:text="@string/plus" />
+
+        <EditText
+            android:id="@+id/labelWpm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/buttonIncreaseFrequency"
+            android:labelFor="@+id/textViewWPM"
+            android:ems="10"
+            android:inputType="text"
+            android:text="@string/wpm" />
 
         <TextView
             android:id="@+id/textViewWPM"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/buttonIncreaseFrequency"
+            android:layout_below="@id/labelWpm"
             android:layout_marginStart="20dp"
             android:layout_marginTop="13dp"
-            android:text="@string/wpm_20"
+            android:text="@{String.valueOf(viewmodel.wpmFlow)}"
             android:textSize="18sp" />
 
         <Button
@@ -54,6 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/textViewWPM"
             android:layout_marginStart="20dp"
+            android:onClick="@{viewmodel.decreaseWpm}"
             android:text="@string/decrease" />
 
         <Button
@@ -64,25 +82,36 @@
             android:layout_marginStart="60dp"
             android:layout_marginTop="-1dp"
             android:layout_toEndOf="@id/buttonDecreaseWPM"
+            android:onClick="@{viewmodel.increaseWpm}"
             android:text="@string/plus" />
+
+        <EditText
+            android:id="@+id/labelFarnsworthWpm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/buttonIncreaseWPM"
+            android:labelFor="@+id/textViewFarnsworthWPM"
+            android:ems="10"
+            android:inputType="text"
+            android:text="@string/wpm" />
 
         <TextView
             android:id="@+id/textViewFarnsworthWPM"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/buttonIncreaseWPM"
-            android:layout_marginTop="18dp"
+            android:layout_below="@id/labelFarnsworthWpm"
             android:layout_marginStart="20dp"
-
-            android:text="@string/farnsworth_wpm"
+            android:layout_marginTop="18dp"
+            android:text="@{String.valueOf(viewmodel.farnsworthWpmFlow)}"
             android:textSize="18sp" />
 
         <Button
             android:id="@+id/buttonDecreaseFarnsworthWPM"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:layout_below="@id/textViewFarnsworthWPM"
+            android:layout_marginStart="20dp"
+            android:onClick="@{viewmodel.decreaseFarnsworthWpm}"
             android:text="@string/decrease" />
 
         <Button
@@ -93,7 +122,15 @@
             android:layout_marginStart="60dp"
             android:layout_marginTop="1dp"
             android:layout_toEndOf="@id/buttonDecreaseFarnsworthWPM"
+            android:onClick="@{viewmodel.increaseFarnsworthWpm}"
+
             android:text="@string/plus" />
 
     </RelativeLayout>
+
+    <data>
+        <variable
+            name="viewmodel"
+            type="net.maui.morselab.viewmodel.UserPreferencesViewModel" />
+    </data>
 </layout>

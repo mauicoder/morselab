@@ -4,8 +4,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
+    id("kotlin-kapt")
     id("com.google.protobuf") version "0.9.4"
-
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -55,10 +56,13 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     //Datastore protobuf
-    implementation("androidx.datastore:datastore:1.0.0")
-    implementation("com.google.protobuf:protobuf-javalite:3.18.0")
-    implementation("com.google.protobuf:protobuf-kotlin-lite:3.21.11")
+    implementation(libs.androidx.datastore)
+    implementation(libs.protobuf.javalite)
+    implementation(libs.protobuf.kotlin.lite)
 
+    //Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
 
     // Jetpack Compose integration
     implementation(libs.androidx.navigation.compose)
@@ -80,6 +84,11 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }
 
 protobuf {
