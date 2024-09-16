@@ -45,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/wpmText"
-            android:layout_alignTop="@+id/farnsworthWpmText"
+            android:layout_marginBottom="10dp"
             android:hint="frequency"
             android:text="@{String.valueOf(viewmodel.frequencyFlow)}" />
 
@@ -54,7 +54,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/farnsworthWpmText"
-            android:layout_alignTop="@+id/farnsworthWpmText"
             android:hint="wpm"
             android:text="@{String.valueOf(viewmodel.wpmFlow)}" />
 
@@ -63,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="20dp"
             android:hint="farnsworth wpm"
             android:text="@{String.valueOf(viewmodel.farnsworthWpmFlow)}" />
     </RelativeLayout>
