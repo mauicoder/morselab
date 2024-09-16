@@ -93,7 +93,7 @@
             android:labelFor="@+id/textViewFarnsworthWPM"
             android:ems="10"
             android:inputType="text"
-            android:text="@string/wpm" />
+            android:text="@string/farnsworth_wpm" />
 
         <TextView
             android:id="@+id/textViewFarnsworthWPM"
