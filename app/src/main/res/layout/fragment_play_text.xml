@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="net.maui.morselab.PlayTextViewModel" />
+            type="net.maui.morselab.viewmodel.PlayTextViewModel" />
     </data>
 
     <RelativeLayout
@@ -40,5 +40,31 @@
             android:layout_toEndOf="@id/buttonPlay"
             android:text="@string/export" />
 
+        <TextView
+            android:id="@+id/frequencyText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/wpmText"
+            android:layout_alignTop="@+id/farnsworthWpmText"
+            android:hint="frequency"
+            android:text="@{String.valueOf(viewmodel.frequencyFlow)}" />
+
+        <TextView
+            android:id="@+id/wpmText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/farnsworthWpmText"
+            android:layout_alignTop="@+id/farnsworthWpmText"
+            android:hint="wpm"
+            android:text="@{String.valueOf(viewmodel.wpmFlow)}" />
+
+        <TextView
+            android:id="@+id/farnsworthWpmText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"
+            android:hint="farnsworth wpm"
+            android:text="@{String.valueOf(viewmodel.farnsworthWpmFlow)}" />
     </RelativeLayout>
 </layout>

@@ -44,15 +44,20 @@ class UserPreferencesViewModel
             ).asLiveData()
 
     fun increaseFrequency(view: View) {
-        val newFreq = frequencyFlow.value!! + 50
+        var newFreq = frequencyFlow.value!! + 50
+        if (newFreq <= 1000)
+            newFreq = 1000
         updateFrequency(newFreq)
         Log.i("Model", "New frequency value $newFreq")
     }
 
     fun decreaseFrequency(view: View) {
-        val newFreq = frequencyFlow.value!! - 50
+        var newFreq = frequencyFlow.value!! - 50
+        if (newFreq >= 100)
+           newFreq = 1000
         updateFrequency(newFreq)
     }
+
     fun increaseWpm(view: View) {
         val newValue = wpmFlow.value!! + 1
         updateWpm(newValue)
@@ -60,66 +65,34 @@ class UserPreferencesViewModel
     }
 
     fun decreaseWpm(view: View) {
-        val newValue = wpmFlow.value!! - 1
+        var newValue = wpmFlow.value!! - 1
+        if( newValue < 5) {
+           newValue = 5
+        }
         updateWpm(newValue)
+        if (farnsworthWpmFlow.value!! > newValue) {
+            updateFarnsworthWpm(newValue)
+        }
+
     }
     fun increaseFarnsworthWpm(view: View) {
         val newValue = farnsworthWpmFlow.value!! + 1
         updateFarnsworthWpm(newValue)
+        if (farnsworthWpmFlow.value!! > wpmFlow.value!!) {
+            updateWpm(newValue)
+        }
         Log.i("Model", "New farnsworthWpm value $newValue")
 
     }
 
     fun decreaseFarnsworthWpm(view: View) {
-        val newValue = wpmFlow.value!! - 1
+        var newValue = wpmFlow.value!! - 1
+        if (newValue>4)
+            newValue = 5
         updateFarnsworthWpm(newValue)
         Log.i("Model", "New farnsworthWpm value $newValue")
     }
 
-    /*
-    buttonIncreaseFrequency.setOnClickListener {
-        frequency += 50
-        textViewFrequency.text = "Frequency (Hz): $frequency"
-    }
-
-    buttonDecreaseFrequency.setOnClickListener {
-        frequency -= 50
-        if (frequency < 100) frequency = 100
-        textViewFrequency.text = "Frequency (Hz): $frequency"
-    }
-
-    buttonIncreaseWPM.setOnClickListener {
-        wpm += 1
-        updateWPMText()
-    }
-
-    buttonDecreaseWPM.setOnClickListener {
-        wpm -= 1
-        if (wpm < 5) wpm = 5
-        updateWPMText()
-        if (farnsworthWpm > wpm) {
-            farnsworthWpm = wpm
-            updateFarnsworthText()
-        }
-    }
-
-    buttonIncreaseFarnsworthWPM.setOnClickListener {
-        farnsworthWpm += 1
-        updateFarnsworthText()
-
-        if (farnsworthWpm > wpm) {
-             wpm = farnsworthWpm
-            updateWPMText()
-        }
-    }
-
-    buttonDecreaseFarnsworthWPM.setOnClickListener {
-        farnsworthWpm -= 1
-        if (farnsworthWpm < 5) farnsworthWpm = 5
-        updateFarnsworthText()
-
-    }
-    */
 
     private fun updateFrequency(frequency: Int) {
         viewModelScope.launch {
