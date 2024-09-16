@@ -45,7 +45,7 @@ class UserPreferencesViewModel
 
     fun increaseFrequency(view: View) {
         var newFreq = frequencyFlow.value!! + 50
-        if (newFreq <= 1000)
+        if (newFreq > 1000)
             newFreq = 1000
         updateFrequency(newFreq)
         Log.i("Model", "New frequency value $newFreq")
@@ -53,7 +53,7 @@ class UserPreferencesViewModel
 
     fun decreaseFrequency(view: View) {
         var newFreq = frequencyFlow.value!! - 50
-        if (newFreq >= 100)
+        if (newFreq < 100)
            newFreq = 1000
         updateFrequency(newFreq)
     }
@@ -78,7 +78,7 @@ class UserPreferencesViewModel
     fun increaseFarnsworthWpm(view: View) {
         val newValue = farnsworthWpmFlow.value!! + 1
         updateFarnsworthWpm(newValue)
-        if (farnsworthWpmFlow.value!! > wpmFlow.value!!) {
+        if (newValue > wpmFlow.value!!) {
             updateWpm(newValue)
         }
         Log.i("Model", "New farnsworthWpm value $newValue")
@@ -86,8 +86,8 @@ class UserPreferencesViewModel
     }
 
     fun decreaseFarnsworthWpm(view: View) {
-        var newValue = wpmFlow.value!! - 1
-        if (newValue>4)
+        var newValue = farnsworthWpmFlow.value!! - 1
+        if (newValue < 5 )
             newValue = 5
         updateFarnsworthWpm(newValue)
         Log.i("Model", "New farnsworthWpm value $newValue")

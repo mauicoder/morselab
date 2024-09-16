@@ -16,6 +16,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     @Inject
     lateinit var configFragment: ConfigFragment
+    @Inject
+    lateinit var playTextFragment: PlayTextFragment
 
     private fun replaceFragment(fragment: Fragment) : Boolean {
         supportFragmentManager.beginTransaction().replace(R.id.flFragment, fragment).commit()
@@ -26,12 +28,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        val playTextFragment = PlayTextFragment()
-/*
-        val configFragment: ConfigFragment =
-            (supportFragmentManager.findFragmentByTag("ConfigFragment") as ConfigFragment)
-*/
-
+        // val playTextFragment = PlayTextFragment()
 
         binding.bottomNavigationView.setOnItemSelectedListener {
             when(it.itemId) {
