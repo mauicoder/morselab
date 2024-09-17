@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/enter_text"
-            android:text="@{viewmodel.text}"
+            android:text="@={viewmodel.textLiveData}"
             android:inputType="text" />
 
 

@@ -49,24 +49,7 @@ class PlayTextFragment @Inject constructor(): Fragment() {
 
         binding.viewmodel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
-        viewModel.wpmFlow.observe(viewLifecycleOwner, Observer<Int> {
-            @Override
-            fun onChanged(value: Int){
-                Log.i(TAG, "wpm changed $value")
-            }
-        })
-        viewModel.farnsworthWpmFlow.observe(viewLifecycleOwner, Observer<Int> {
-            @Override
-            fun onChanged(value: Int){
-                Log.i(TAG, "farnsworthWpmFlow changed $value")
-            }
-        })
-        viewModel.frequencyFlow.observe(viewLifecycleOwner, Observer<Int> {
-            @Override
-            fun onChanged(value: Int){
-                Log.i(TAG, "frequencyFlow changed $value")
-            }
-        })
+
         binding.executePendingBindings()
         Log.i(TAG, "onCreateView: F: ${viewModel.frequencyFlow.value}; Wpm: ${viewModel.wpmFlow.value}; FWpm: ${viewModel.farnsworthWpmFlow.value}")
         return binding.root

@@ -2,8 +2,10 @@ package net.maui.morselab.viewmodel
 
 import android.media.AudioFormat
 import android.media.AudioTrack
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -11,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
@@ -21,13 +24,20 @@ import net.maui.morselab.generator.MorseSoundGenerator
 import javax.inject.Inject
 
 @HiltViewModel
-class PlayTextViewModel @Inject constructor(private val userPreferencesRepository: UserPreferencesRepositoryImpl
+class PlayTextViewModel @Inject constructor(
+    userPreferencesRepository: UserPreferencesRepositoryImpl
 ) : ViewModel(
 ) {
 
     private val SAMPLE_RATE = 44100
+    private val TAG = "PlayTextViewModel"
 
-    var text = "Hello World!"
+    private var playJob: Job? = null
+    private val morseSoundGenerator = MorseSoundGenerator()
+    private val shareFile = ShareFile()
+
+    val textLiveData: MutableLiveData<String> = MutableLiveData("Hello")
+
     val frequencyFlow: LiveData<Int> =
         userPreferencesRepository.getPreferencesFlow().map { it -> it.frequency }
             .shareIn( // Only collect from the booksRepository when the UI is visible
@@ -42,6 +52,7 @@ class PlayTextViewModel @Inject constructor(private val userPreferencesRepositor
                 started = SharingStarted.WhileSubscribed(5000),
                 replay = 1
             ).asLiveData()
+
     val farnsworthWpmFlow: LiveData<Int> =
         userPreferencesRepository.getPreferencesFlow().map { it -> it.farnsworthWpm }
             .shareIn( // Only collect from the booksRepository when the UI is visible
@@ -50,31 +61,49 @@ class PlayTextViewModel @Inject constructor(private val userPreferencesRepositor
                 replay = 1
             ).asLiveData()
 
-    private var playJob: Job? = null
-    private val morseSoundGenerator = MorseSoundGenerator()
-    private val shareFile = ShareFile()
-
 
     fun playMorseCallback() {
         if (playJob != null && playJob!!.isActive)
             return //ignore as a playJob is already running
         playJob = CoroutineScope(context = Dispatchers.Default).launch {
-            playMorse(text, wpmFlow.value!!, farnsworthWpmFlow.value!!, frequencyFlow.value!!, SAMPLE_RATE)
+            playMorse(
+                textLiveData.value!!,
+                wpmFlow.value!!,
+                farnsworthWpmFlow.value!!,
+                frequencyFlow.value!!,
+                SAMPLE_RATE
+            )
         }
     }
 
     fun exportAsWave(activity: FragmentActivity) {
-        val waveStream = morseSoundGenerator.generateWave(text, wpmFlow.value!!, farnsworthWpmFlow.value!!, frequencyFlow.value!!, SAMPLE_RATE)
+        val waveStream = morseSoundGenerator.generateWave(
+            textLiveData.value!!,
+            wpmFlow.value!!,
+            farnsworthWpmFlow.value!!,
+            frequencyFlow.value!!,
+            SAMPLE_RATE
+        )
 
         shareFile.shareAsFile(activity, waveStream)
     }
 
-    private fun playMorse(text: String,
-                          wpm: Int,
-                          farnsworthWpm: Int,
-                          frequency: Int,
-                          sampleRate: Int) {
-        val morseCodeSound = morseSoundGenerator.generate(text, wpmFlow.value!!, farnsworthWpmFlow.value!!, frequencyFlow.value!!, sampleRate)
+    private fun playMorse(
+        text: String,
+        wpm: Int,
+        farnsworthWpm: Int,
+        frequency: Int,
+        sampleRate: Int
+    ) {
+
+        Log.i(TAG, "playMorse( $text $wpm $farnsworthWpm $frequency $sampleRate)")
+        val morseCodeSound = morseSoundGenerator.generate(
+            text,
+            wpm,
+            farnsworthWpm,
+            frequency,
+            sampleRate
+        )
         playSound(morseCodeSound, sampleRate)
     }
 
