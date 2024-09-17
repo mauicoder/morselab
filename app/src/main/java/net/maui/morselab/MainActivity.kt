@@ -28,8 +28,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        // val playTextFragment = PlayTextFragment()
-
         binding.bottomNavigationView.setOnItemSelectedListener {
             when(it.itemId) {
               R.id.miPlay -> replaceFragment(playTextFragment)
