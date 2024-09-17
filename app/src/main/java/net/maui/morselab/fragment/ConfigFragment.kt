@@ -69,29 +69,4 @@ class ConfigFragment @Inject constructor() : Fragment() {
         binding.executePendingBindings()
         return binding.root
     }
-
-    fun increaseFrequency(view: View) {
-        viewModel.increaseFrequency()
-    }
-
-    fun decreaseFrequency(view: View) {
-        viewModel.decreaseFrequency()
-    }
-
-    fun increaseWpm(view: View) {
-        viewModel.increaseWpm()
-    }
-
-    fun decreaseWpm(view: View) {
-        viewModel.decreaseFrequency()
-    }
-
-    fun increaseFarnsworthWpm(view: View) {
-        viewModel.increaseFarnsworthWpm()
-    }
-
-    fun decreaseFarnsworthWpm(view: View) {
-        viewModel.decreaseFarnsworthWpm()
-    }
-
 }
