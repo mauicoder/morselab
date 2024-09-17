@@ -37,7 +37,7 @@ class ConfigFragment @Inject constructor() : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_config, container, false)
         //val viewModel : UserPreferencesViewModel by viewModels()
         binding.viewmodel = viewModel
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
         viewModel.wpmFlow.observe(viewLifecycleOwner, Observer<Int> {
             @Override
             fun onChanged(value: Int) {

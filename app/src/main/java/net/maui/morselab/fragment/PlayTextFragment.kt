@@ -20,6 +20,7 @@ import javax.inject.Inject
 class PlayTextFragment @Inject constructor(): Fragment() {
 
     private val viewModel: PlayTextViewModel by viewModels()
+    private var _binding: FragmentPlayTextBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,19 +29,25 @@ class PlayTextFragment @Inject constructor(): Fragment() {
 
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = DataBindingUtil.inflate<FragmentPlayTextBinding>(
+        _binding = DataBindingUtil.inflate<FragmentPlayTextBinding>(
             inflater, R.layout.fragment_play_text, container, false);
+        val binding : FragmentPlayTextBinding = _binding!!
 
         binding.buttonPlay.setOnClickListener {viewModel.playMorseCallback()
         }
         binding.buttonExport.setOnClickListener { viewModel.exportAsWave(activity = requireActivity()) }
 
         binding.viewmodel = viewModel
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
         viewModel.wpmFlow.observe(viewLifecycleOwner, Observer<Int> {
             @Override
             fun onChanged(value: Int){

@@ -56,6 +56,7 @@ class UserPreferencesViewModel
         if (newFreq < 100)
            newFreq = 1000
         updateFrequency(newFreq)
+        Log.i("Model", "New frequency value $newFreq")
     }
 
     fun increaseWpm() {
@@ -70,8 +71,12 @@ class UserPreferencesViewModel
            newValue = 5
         }
         updateWpm(newValue)
+        Log.i("Model", "New Wpm value $newValue")
+
         if (farnsworthWpmFlow.value!! > newValue) {
             updateFarnsworthWpm(newValue)
+            Log.i("Model", "New farnsworthWpm value $newValue")
+
         }
 
     }
@@ -80,6 +85,7 @@ class UserPreferencesViewModel
         updateFarnsworthWpm(newValue)
         if (newValue > wpmFlow.value!!) {
             updateWpm(newValue)
+            Log.i("Model", "New Wpm value $newValue")
         }
         Log.i("Model", "New farnsworthWpm value $newValue")
 
@@ -97,6 +103,7 @@ class UserPreferencesViewModel
     private fun updateFrequency(frequency: Int) {
         viewModelScope.launch {
             userPreferencesRepository.updateFrequency(frequency)
+
         }
     }
     private fun updateWpm(wpm: Int) {
