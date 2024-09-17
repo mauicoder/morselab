@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +21,7 @@ import javax.inject.Inject
 class PlayTextFragment @Inject constructor(): Fragment() {
 
     private val TAG = "PlayTextFragment"
-    private val viewModel: PlayTextViewModel by viewModels()
+    private val viewModel: PlayTextViewModel by activityViewModels()
     private var _binding: FragmentPlayTextBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

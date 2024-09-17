@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +21,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ConfigFragment @Inject constructor() : Fragment() {
 
-    private val viewModel: UserPreferencesViewModel by viewModels()
+    private val viewModel: UserPreferencesViewModel by activityViewModels()
     private var _binding: FragmentConfigBinding? = null
 
 
