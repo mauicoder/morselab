@@ -20,8 +20,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ConfigFragment @Inject constructor() : Fragment() {
 
-    private lateinit var binding: FragmentConfigBinding
     private val viewModel: UserPreferencesViewModel by viewModels()
+    private var _binding: FragmentConfigBinding? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,12 +30,16 @@ class ConfigFragment @Inject constructor() : Fragment() {
         // TODO: Use the ViewModel
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_config, container, false)
-        //val viewModel : UserPreferencesViewModel by viewModels()
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_config, container, false)
+        val binding = _binding!!
         binding.viewmodel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel.wpmFlow.observe(viewLifecycleOwner, Observer<Int> {
