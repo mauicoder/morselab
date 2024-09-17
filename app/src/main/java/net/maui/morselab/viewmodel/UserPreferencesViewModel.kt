@@ -43,7 +43,7 @@ class UserPreferencesViewModel
                 replay = 1
             ).asLiveData()
 
-    fun increaseFrequency(view: View) {
+    fun increaseFrequency() {
         var newFreq = frequencyFlow.value!! + 50
         if (newFreq > 1000)
             newFreq = 1000
@@ -51,20 +51,20 @@ class UserPreferencesViewModel
         Log.i("Model", "New frequency value $newFreq")
     }
 
-    fun decreaseFrequency(view: View) {
+    fun decreaseFrequency() {
         var newFreq = frequencyFlow.value!! - 50
         if (newFreq < 100)
            newFreq = 1000
         updateFrequency(newFreq)
     }
 
-    fun increaseWpm(view: View) {
+    fun increaseWpm() {
         val newValue = wpmFlow.value!! + 1
         updateWpm(newValue)
         Log.i("Model", "New Wpm value $newValue")
     }
 
-    fun decreaseWpm(view: View) {
+    fun decreaseWpm() {
         var newValue = wpmFlow.value!! - 1
         if( newValue < 5) {
            newValue = 5
@@ -75,7 +75,7 @@ class UserPreferencesViewModel
         }
 
     }
-    fun increaseFarnsworthWpm(view: View) {
+    fun increaseFarnsworthWpm() {
         val newValue = farnsworthWpmFlow.value!! + 1
         updateFarnsworthWpm(newValue)
         if (newValue > wpmFlow.value!!) {
@@ -85,7 +85,7 @@ class UserPreferencesViewModel
 
     }
 
-    fun decreaseFarnsworthWpm(view: View) {
+    fun decreaseFarnsworthWpm() {
         var newValue = farnsworthWpmFlow.value!! - 1
         if (newValue < 5 )
             newValue = 5
