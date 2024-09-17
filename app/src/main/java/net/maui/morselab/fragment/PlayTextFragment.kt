@@ -19,6 +19,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PlayTextFragment @Inject constructor(): Fragment() {
 
+    private val TAG = "PlayTextFragment"
     private val viewModel: PlayTextViewModel by viewModels()
     private var _binding: FragmentPlayTextBinding? = null
 
@@ -26,7 +27,6 @@ class PlayTextFragment @Inject constructor(): Fragment() {
         super.onCreate(savedInstanceState)
 
         // TODO: Use the ViewModel
-
     }
 
     override fun onDestroyView() {
@@ -51,22 +51,23 @@ class PlayTextFragment @Inject constructor(): Fragment() {
         viewModel.wpmFlow.observe(viewLifecycleOwner, Observer<Int> {
             @Override
             fun onChanged(value: Int){
-                Log.i("ConfigFragment", "wpm changed $value")
+                Log.i(TAG, "wpm changed $value")
             }
         })
         viewModel.farnsworthWpmFlow.observe(viewLifecycleOwner, Observer<Int> {
             @Override
             fun onChanged(value: Int){
-                Log.i("ConfigFragment", "farnsworthWpmFlow changed $value")
+                Log.i(TAG, "farnsworthWpmFlow changed $value")
             }
         })
         viewModel.frequencyFlow.observe(viewLifecycleOwner, Observer<Int> {
             @Override
             fun onChanged(value: Int){
-                Log.i("ConfigFragment", "frequencyFlow changed $value")
+                Log.i(TAG, "frequencyFlow changed $value")
             }
         })
         binding.executePendingBindings()
+        Log.i(TAG, "onCreateView: F: ${viewModel.frequencyFlow.value}; Wpm: ${viewModel.wpmFlow.value}; FWpm: ${viewModel.farnsworthWpmFlow.value}")
         return binding.root
     }
 
