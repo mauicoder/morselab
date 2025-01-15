@@ -4,14 +4,13 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
-    id("kotlin-kapt")
     id("com.google.protobuf") version "0.9.4"
     id("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "net.maui.morselab"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "net.maui.morselab"
@@ -38,11 +37,11 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "18"
     }
 }
 
@@ -62,7 +61,7 @@ dependencies {
 
     //Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     // Jetpack Compose integration
     implementation(libs.androidx.navigation.compose)
@@ -84,11 +83,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-}
-
-// Allow references to generated code
-kapt {
-    correctErrorTypes = true
 }
 
 protobuf {
