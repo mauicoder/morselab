@@ -12,6 +12,6 @@ Android Studio Ladybug Feature Drop | 2024.2.2
 - configurable parameters
   - Frequency: default 800 Hz
   - WPM (Words per minute): default 20
-  - Farnsworth WPM (actual words per minute): default 15
+  - Farnsworth WPM (actual words per minute): default 20
 
   
