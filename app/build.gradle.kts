@@ -22,6 +22,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+/*
+    applicationVariants.all {
+        val variant = this
+        variant.outputs
+            .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+            .forEach { output ->
+                val outputFileName = "morselab-${variant.baseName}-${variant.versionName}-${variant.versionCode}.apk"
+                output.outputFileName = outputFileName
+            }
+    }
+*/
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -36,6 +47,7 @@ android {
             )
         }
     }
+
 
     dataBinding {
         enable = true
