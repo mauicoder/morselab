@@ -1,7 +1,7 @@
 [versions]
 agp = "8.11.0"
 datastore = "1.1.7"
-hiltAndroid = "2.55"
+hiltAndroid = "2.56.2"
 kotlin = "2.1.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -17,7 +17,7 @@ legacySupportV4 = "1.0.0"
 lifecycleLivedataKtx = "2.9.1"
 lifecycleViewmodelKtx = "2.9.1"
 fragmentKtx = "1.8.8"
-databindingRuntime = "8.10.1"
+databindingRuntime = "8.11.0"
 protobufJavalite = "4.31.1"
 protobufKotlinLite = "4.31.1"
 
