@@ -1,5 +1,5 @@
 # MorseLab
-Android App written in kotlin to experiemnt some functionalities for learning/improving morse code
+Android App written in kotlin to experiment some functionalities for learning/improving morse code
 
 ## Supported Android
 Android 7.0 Nougat api version 24
