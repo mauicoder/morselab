@@ -11,12 +11,12 @@ plugins {
 
 android {
     namespace = "net.maui.morselab"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "net.maui.morselab"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
