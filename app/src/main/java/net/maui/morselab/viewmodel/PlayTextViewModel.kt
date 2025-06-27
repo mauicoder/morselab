@@ -13,7 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
@@ -39,14 +38,14 @@ class PlayTextViewModel @Inject constructor(
     val textLiveData: MutableLiveData<String> = MutableLiveData("Hello")
 
     val frequencyFlow: LiveData<Int> =
-        userPreferencesRepository.getPreferencesFlow().map { it -> it.frequency }
+        userPreferencesRepository.getPreferencesFlow().map { it.frequency }
             .shareIn( // Only collect from the booksRepository when the UI is visible
                 viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
                 replay = 1
             ).asLiveData()
     val wpmFlow: LiveData<Int> =
-        userPreferencesRepository.getPreferencesFlow().map { it -> it.wpm }
+        userPreferencesRepository.getPreferencesFlow().map { it.wpm }
             .shareIn( // Only collect from the booksRepository when the UI is visible
                 viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
@@ -54,7 +53,7 @@ class PlayTextViewModel @Inject constructor(
             ).asLiveData()
 
     val farnsworthWpmFlow: LiveData<Int> =
-        userPreferencesRepository.getPreferencesFlow().map { it -> it.farnsworthWpm }
+        userPreferencesRepository.getPreferencesFlow().map { it.farnsworthWpm }
             .shareIn( // Only collect from the booksRepository when the UI is visible
                 viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
@@ -116,7 +115,7 @@ class PlayTextViewModel @Inject constructor(
                     .build()
             )
             .setAudioFormat(
-                android.media.AudioFormat.Builder()
+                AudioFormat.Builder()
                     .setSampleRate(sampleRate)
                     .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
                     .setEncoding(AudioFormat.ENCODING_PCM_8BIT)
