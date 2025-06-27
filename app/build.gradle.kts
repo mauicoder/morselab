@@ -15,24 +15,13 @@ android {
     defaultConfig {
         applicationId = "net.maui.morselab"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-/*
-    applicationVariants.all {
-        val variant = this
-        variant.outputs
-            .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
-            .forEach { output ->
-                val outputFileName = "morselab-${variant.baseName}-${variant.versionName}-${variant.versionCode}.apk"
-                output.outputFileName = outputFileName
-            }
-    }
-*/
     buildTypes {
         release {
             isMinifyEnabled = false
