@@ -17,4 +17,4 @@ local.properties
 /app/.gitignore
 /gradle/wrapper/gradle-wrapper.jar
 /gradle/wrapper/gradle-wrapper.properties
-/gradle/libs.versions.toml
+/.kotlin/errors/

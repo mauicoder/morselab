@@ -1,12 +1,12 @@
 import com.google.protobuf.gradle.id
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("com.google.devtools.ksp")
-    id("com.google.protobuf") version "0.9.5"
-
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.protobuf)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -47,8 +47,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_18
         targetCompatibility = JavaVersion.VERSION_18
     }
-    kotlinOptions {
-        jvmTarget = "18"
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_18
+        }
     }
 }
 

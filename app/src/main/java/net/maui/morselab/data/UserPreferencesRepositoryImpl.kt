@@ -35,7 +35,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
             it
         else {
             val builder = UserPreferences.newBuilder()
-            if (it.frequency == 0) builder.setFrequency(800) else builder.setFrequency(it.frequency)
+            if (it.frequency == 0) builder.setFrequency(700) else builder.setFrequency(it.frequency)
             if (it.wpm == 0) builder.setWpm(20) else builder.setWpm(it.wpm)
             if (it.farnsworthWpm == 0) builder.setFarnsworthWpm(20) else builder.setFarnsworthWpm(it.farnsworthWpm)
             builder.build()
