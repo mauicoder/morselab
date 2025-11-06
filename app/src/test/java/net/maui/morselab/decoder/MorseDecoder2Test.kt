@@ -56,29 +56,21 @@ class MorseDecoder2Test {
         var offset = 0
         while (offset < audioData.size) {
             val remaining = audioData.size - offset
-
-            // This is the number of actual audio samples we're processing in this iteration.
             val numSamplesInBlock = min(blockSize, remaining)
-
             val block = audioData.copyOfRange(offset, offset + numSamplesInBlock)
 
-            // The 'finalBlock' is always padded to the full blockSize for the Goertzel algorithm,
-            // but the decoder now knows how many "real" samples are in it.
             val finalBlock = if (block.size < blockSize) {
                 block.copyOf(blockSize) // Pads with 0f by default
             } else {
                 block
             }
-
-            // Call the new, robust processBuffer method
             decoder.processBuffer(finalBlock, numSamplesInBlock)
-
             offset += numSamplesInBlock
         }
 
-        // After the last audio block, we must call processBuffer one last time
-        // with a silent block to trigger the timeout logic for the final word.
-        // We tell it we're processing a full block's worth of "silence samples".
-        decoder.processBuffer(FloatArray(blockSize), blockSize)
+        // --- START OF FIX: CALL FLUSH ---
+        // After all audio is processed, flush any remaining characters from the buffer.
+        decoder.flush()
+        // --- END OF FIX ---
     }
 }

@@ -1,7 +1,7 @@
 package net.maui.morselab.decoder
 
-import java.util.logging.Logger
 import net.maui.morselab.utils.MorseCodeMaps
+import java.util.logging.Logger
 import kotlin.math.roundToInt
 
 /**
@@ -16,9 +16,7 @@ class MorseDecoder(
     private val sampleRate: Int = 16000,
     private val blockSize: Int = 512,
 ) {
-    private val logger: Logger = Logger.getLogger(MorseDecoder::class.java.name)
-
-
+    private val logger = Logger.getLogger(MorseDecoder::class.java.name)
 
     private val goertzel = Goertzel(sampleRate, targetFreq, blockSize)
 
@@ -57,15 +55,17 @@ class MorseDecoder(
 
             // Only process events with a meaningful duration
             if (durInSamples > sampleRate * 0.010) { // Ignore fleeting changes (< 10ms worth of samples)
+                // --- START OF FIX ---
                 if (onState) {
-                    // A tone just ended. Add it to our internal buffer.
+                    // A TONE just ended. Its duration is durInSamples. Add it to the buffer.
                     addToneToBuffer(durInSamples)
                     updateUnitDuration(durInSamples)
-                    logger.info("New tone: '$currentCharMorse'")
+                    logger.info("add Tone: '${currentCharMorse}' Updated unit duration to ${dotUnitSamples}")
                 } else {
-                    // A silence just ended. This is our trigger to process a character or space.
+                    // A SILENCE just ended. Its duration is durInSamples. Process it.
                     processSilence(durInSamples)
                 }
+                // --- END OF FIX ---
             }
             // Update the state for the next cycle
             lastStateChangeSamplePos = totalSamplesProcessed
@@ -75,6 +75,19 @@ class MorseDecoder(
         // Advance the total sample count AFTER processing the state change
         totalSamplesProcessed += numSamples
     }
+
+    // --- START OF FIX: NEW FLUSH METHOD ---
+    /**
+     * Processes any remaining characters in the buffer.
+     * Call this when the audio stream ends.
+     */
+    fun flush() {
+        // A long fake silence duration to process the final character
+        val finalSilence = (dotUnitSamples * 4).toLong()
+        processSilence(finalSilence)
+    }
+    // --- END OF FIX ---
+
 
     /** Appends a dot or dash to the internal buffer based on the tone's duration. */
     private fun addToneToBuffer(durationInSamples: Long) {
@@ -88,23 +101,37 @@ class MorseDecoder(
      * character/space and clears the internal buffer.
      */
     private fun processSilence(durationInSamples: Long) {
+        // A silence of any duration could mean the end of a character, but we only
+        // act on it if there's something in the buffer.
+        if (currentCharMorse.isEmpty()) {
+            // If the buffer is empty, this silence might be a word gap.
+            if (dotUnitSamples > 0) {
+                val silenceUnits = (durationInSamples / dotUnitSamples).roundToInt().coerceAtLeast(1)
+                if (silenceUnits >= 7) {
+                    logger.info("End word (no char): firing space")
+                    onDecoded(" ")
+                }
+            }
+            return
+        }
+
+        // There's a character in the buffer. Let's see if this silence is long enough to flush it.
         if (dotUnitSamples <= 0) return
         val silenceUnits = (durationInSamples / dotUnitSamples).roundToInt().coerceAtLeast(1)
 
         // A gap of 3+ units means the character we were building is now complete.
         if (silenceUnits >= 3) {
-            logger.info("silence of >=3: '$currentCharMorse'")
-            if (currentCharMorse.isNotEmpty()) {
-                val char = morseToAscii(currentCharMorse.toString())
-                if (char.isNotEmpty()) {
-                    onDecoded(char)
-                }
-                currentCharMorse.clear()
+            logger.info("End char: '${currentCharMorse}'")
+            val char = morseToAscii(currentCharMorse.toString())
+            if (char.isNotEmpty()) {
+                onDecoded(char)
             }
+            currentCharMorse.clear()
+
 
             // If the gap was also a word separator, fire a space.
             if (silenceUnits >= 7) {
-                logger.info("silence of >=7: '$currentCharMorse'")
+                logger.info("End word: firing space")
                 onDecoded(" ")
             }
         }
