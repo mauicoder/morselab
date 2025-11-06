@@ -6,6 +6,10 @@
             android:title="@string/play_text"
             android:icon="@drawable/ic_play"/>
         <item
+            android:id="@+id/miDecode"
+            android:title="@string/decode"
+            android:icon="@drawable/ic_mic"/>
+        <item
             android:id="@+id/miConfig"
             android:title="@string/config"
             android:icon="@drawable/ic_settings"/>
