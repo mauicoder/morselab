@@ -45,18 +45,13 @@ class MorseDecoder(
     fun processBuffer(audioBuffer: FloatArray, numSamples: Int) {
         val mag: Double
         // Calculate the threshold based on the median of the noise floor history.
-        // It's calculated here so the frequency lock logic can use it immediately.
         val median = magHistory.sorted().getOrElse(magHistory.size / 2) { 0.0 }
         val thresholdOn = median * 6.0 + 1e-9
 
-        // --- RESTORED AND CORRECTED FREQUENCY LOCKING LOGIC ---
         if (goertzel == null) {
             val mag800 = goertzel800.magnitudeSquared(audioBuffer)
             val mag700 = goertzel700.magnitudeSquared(audioBuffer)
             val mag600 = goertzel600.magnitudeSquared(audioBuffer)
-
-            // --- LOG RESTORED HERE ---
-            logger.info("Frequency Scan: mag800=${mag800.toInt()}, mag700=${mag700.toInt()}, mag600=${mag600.toInt()}")
 
             mag = maxOf(mag800, mag700, mag600)
 
@@ -74,13 +69,10 @@ class MorseDecoder(
                 }
             }
         } else {
-            // A filter is already locked, so we only use that one.
             mag = goertzel!!.magnitudeSquared(audioBuffer)
         }
 
-        // --- THE UNBREAKABLE THRESHOLD FIX ---
         // ONLY update the noise floor history if the current signal is considered silence.
-        // This prevents tones from corrupting the noise floor calculation.
         if (mag < thresholdOn) {
             magHistory.addLast(mag)
             if (magHistory.size > histSize) magHistory.removeFirst()
@@ -89,46 +81,30 @@ class MorseDecoder(
         val thresholdOff = median * 3.0 + 1e-9
         val newOn = if (onState) mag > thresholdOff else mag > thresholdOn
 
-        // --- THE UNBREAKABLE STATE MACHINE ---
         if (newOn != onState) {
             val durationOfPreviousState = totalSamplesProcessed - lastStateChangeSamplePos
-            logger.info(
-                "STATE CHANGE: ${if (onState) "TONE" else "SILENCE"} -> ${if (newOn) "TONE" else "SILENCE"}. " +
-                        "Duration: $durationOfPreviousState"
-            )
-
-            if (durationOfPreviousState > sampleRate * 0.015) {
+            if (durationOfPreviousState > sampleRate * 0.015) { // Denoise
                 if (onState) { // Previous state was TONE
                     processTone(durationOfPreviousState)
                 } else { // Previous state was SILENCE
                     processSilence(durationOfPreviousState)
                 }
-            } else {
-                logger.info("Ignoring state change due to duration being too short: $durationOfPreviousState > ${sampleRate * 0.015}")
             }
             lastStateChangeSamplePos = totalSamplesProcessed
         }
         onState = newOn
-        // --- END OF STATE MACHINE ---
 
         totalSamplesProcessed += numSamples
     }
 
     fun flush() {
-        logger.info("--- flush() called ---")
         val finalDuration = totalSamplesProcessed - lastStateChangeSamplePos
-        logger.info("Final state duration before flush: $finalDuration")
         if (finalDuration > sampleRate * 0.015) {
-            if (onState) {
-                processTone(finalDuration)
-            } else {
-                processSilence(finalDuration)
-            }
+            if (onState) processTone(finalDuration)
+            else processSilence(finalDuration)
         }
-        logger.info("Flushing with final fake long silence.")
         processSilence((dotUnitSamples * 7).toLong())
     }
-
 
     private fun processTone(durationInSamples: Long) {
         if (dotUnitSamples <= 0) return
@@ -139,44 +115,28 @@ class MorseDecoder(
         if (symbol == '.') {
             updateUnitDuration(durationInSamples)
         }
-        val timeInMs = (totalSamplesProcessed * 1000) / sampleRate
-        logger.info(
-            "TONE ended at sample $totalSamplesProcessed (${timeInMs}ms). " +
-                    "Buffer: '${currentCharMorse}' (Symbol: $symbol, Duration: $durationInSamples, Unit: ${dotUnitSamples.roundToInt()})"
-        )
     }
 
     private fun processSilence(durationInSamples: Long) {
+        if (dotUnitSamples <= 0) return
         val silenceUnits = (durationInSamples / dotUnitSamples).roundToInt().coerceAtLeast(1)
-        val timeInMs = (totalSamplesProcessed * 1000) / sampleRate
-        logger.info(
-            "processSilence at sample $totalSamplesProcessed (${timeInMs}ms): " +
-                    "Duration=$durationInSamples, dotUnit=${dotUnitSamples.roundToInt()}, Calculated Units=$silenceUnits"
-        )
 
         if (silenceUnits >= 3) {
-            logger.info("Silence detected as SEPARATOR (units >= 3).")
             if (currentCharMorse.isNotEmpty()) {
                 val char = morseToAscii(currentCharMorse.toString())
-                logger.info("End char: '${currentCharMorse}' -> '$char'")
                 if (char.isNotEmpty()) {
                     onDecoded(char)
                     hasDecodedFirstChar = true
                 }
                 currentCharMorse.clear()
             }
-
             if (silenceUnits >= 7 && hasDecodedFirstChar) {
-                logger.info("Firing WORD SPACE")
                 onDecoded(" ")
             }
-        } else {
-            logger.info("Silence detected as INTRA-CHARACTER gap (units < 3). No action taken.")
         }
     }
 
     fun reset() {
-        logger.info("--- Decoder Reset ---")
         magHistory.clear()
         onState = false
         totalSamplesProcessed = 0
@@ -195,12 +155,17 @@ class MorseDecoder(
         }
         if (recentDotDurations.isEmpty()) return
 
-        val sortedDots = recentDotDurations.sorted()
-        val medianDot = sortedDots[sortedDots.size / 2].toDouble()
+        // --- THE FINAL AND UNBREAKABLE FIX ---
+        // The most reliable "dot" is the SHORTEST valid tone we've seen recently.
+        // This is extremely resistant to being skewed by longer dots or dashes.
+        val shortestDot = recentDotDurations.minOrNull()?.toDouble() ?: dotUnitSamples
 
         val oldUnit = dotUnitSamples
-        dotUnitSamples = (dotUnitSamples * 0.5) + (medianDot * 0.5)
-        logger.info("updateUnitDuration: oldUnit=${oldUnit.roundToInt()}, medianDot=${medianDot.roundToInt()}, newUnit=${dotUnitSamples.roundToInt()}")
+        if (shortestDot > 0) {
+            // We still smooth gently, but we smooth towards the most stable possible value.
+            dotUnitSamples = (dotUnitSamples * 0.7) + (shortestDot * 0.3)
+        }
+        // --- END OF FIX ---
     }
 
     private fun morseToAscii(morse: String): String {
