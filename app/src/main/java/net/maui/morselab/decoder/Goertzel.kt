@@ -2,7 +2,7 @@ package net.maui.morselab.decoder
 import kotlin.math.*
 
 /** Simple Goertzel implementation for one frequency */
-class Goertzel(val sampleRate: Int, val targetFreq: Double, val blockSize: Int) {
+class Goertzel(val sampleRate: Double, val targetFreq: Double, val blockSize: Int) {
     private val k = (0.5 + (blockSize * targetFreq / sampleRate)).toInt()
     private val omega = 2.0 * Math.PI * k / blockSize
     private val coeff = 2.0 * cos(omega)
