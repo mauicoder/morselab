@@ -103,6 +103,8 @@ class MorseDecoder(
                 } else { // Previous state was SILENCE
                     processSilence(durationOfPreviousState)
                 }
+            } else {
+                logger.info("Ignoring state change due to duration being too short: $durationOfPreviousState > ${sampleRate * 0.015}")
             }
             lastStateChangeSamplePos = totalSamplesProcessed
         }
