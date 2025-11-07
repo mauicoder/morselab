@@ -44,6 +44,8 @@ class MorseDecoder(
 
     fun processBuffer(audioBuffer: FloatArray, numSamples: Int) {
         val mag: Double
+        // Calculate the threshold based on the median of the noise floor history.
+        // It's calculated here so the frequency lock logic can use it immediately.
         val median = magHistory.sorted().getOrElse(magHistory.size / 2) { 0.0 }
         val thresholdOn = median * 6.0 + 1e-9
 
@@ -52,10 +54,14 @@ class MorseDecoder(
             val mag800 = goertzel800.magnitudeSquared(audioBuffer)
             val mag700 = goertzel700.magnitudeSquared(audioBuffer)
             val mag600 = goertzel600.magnitudeSquared(audioBuffer)
+
+            // --- LOG RESTORED HERE ---
             logger.info("Frequency Scan: mag800=${mag800.toInt()}, mag700=${mag700.toInt()}, mag600=${mag600.toInt()}")
+
             mag = maxOf(mag800, mag700, mag600)
 
-            if (mag > thresholdOn) { // Use the threshold we just calculated
+            // Attempt to lock only when a confident tone is detected using the adaptive threshold
+            if (mag > thresholdOn) {
                 if (mag == mag800) {
                     goertzel = goertzel800
                     logger.info(">>> Goertzel filter locked to 800 Hz <<<")
@@ -68,11 +74,12 @@ class MorseDecoder(
                 }
             }
         } else {
+            // A filter is already locked, so we only use that one.
             mag = goertzel!!.magnitudeSquared(audioBuffer)
         }
 
         // --- THE UNBREAKABLE THRESHOLD FIX ---
-        // ONLY update the noise floor history if we are in a state of SILENCE.
+        // ONLY update the noise floor history if the current signal is considered silence.
         // This prevents tones from corrupting the noise floor calculation.
         if (mag < thresholdOn) {
             magHistory.addLast(mag)
