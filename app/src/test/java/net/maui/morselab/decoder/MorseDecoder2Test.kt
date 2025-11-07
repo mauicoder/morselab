@@ -44,7 +44,7 @@ class MorseDecoder2Test {
 
         // 5. Assert the final decoded string is correct
         // Using trim() and replace() to make the assertion robust against extra whitespace.
-        assertEquals("HI SOS", decodedString)
+        assertEquals("HI SOS", decodedString.trim())
     }
 
     /**
