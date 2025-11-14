@@ -192,8 +192,8 @@ class MorseDecoder(
         if (evidenceDuration <= 0) return
 
         val oldUnit = silenceUnitSamples
-        // Use a simple smoothing average for silence
-        silenceUnitSamples = (silenceUnitSamples * 0.7) + (evidenceDuration * 0.3)
+        // Use a gentle smoothing average for silence to avoid aggressive changes
+        silenceUnitSamples = (silenceUnitSamples * 0.9) + (evidenceDuration * 0.1)
         logger.info("updateSilenceUnit: old=${oldUnit.roundToInt()}, evidence=${evidenceDuration.roundToInt()}, new=${silenceUnitSamples.roundToInt()}")
     }
 
