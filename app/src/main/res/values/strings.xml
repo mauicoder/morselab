@@ -12,4 +12,7 @@
     <string name="export">Export</string>
     <string name="config">Config</string>
     <string name="play_text">play text</string>
+    <string name="morse_code_decoder">Morse Code Decoder</string>
+    <string name="start_decoding">Start Decoding</string>
+    <string name="decode">Decode</string>
 </resources>
