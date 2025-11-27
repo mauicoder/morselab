@@ -168,8 +168,13 @@ class MorseDecoder(
                 onDecoded(" ")
             }
         } else {
-            logger.info("Silence detected as INTRA-CHARACTER gap (units < 3).")
-            updateSilenceUnit(durationInSamples)
+            // Only learn from unambiguous 1-unit gaps.
+            if (silenceUnits == 1) {
+                logger.info("Silence detected as 1-unit INTRA-CHARACTER gap. Updating silence unit.")
+                updateSilenceUnit(durationInSamples)
+            } else {
+                logger.info("Silence detected as 2-unit INTRA-CHARACTER gap. Not updating silence unit.")
+            }
         }
     }
 
@@ -192,8 +197,16 @@ class MorseDecoder(
         if (evidenceDuration <= 0) return
 
         val oldUnit = silenceUnitSamples
-        // Use a gentle smoothing average for silence to avoid aggressive changes
-        silenceUnitSamples = (silenceUnitSamples * 0.9) + (evidenceDuration * 0.1)
+        var newUnit = (silenceUnitSamples * 0.9) + (evidenceDuration * 0.1)
+
+        // Prevent silence unit from drifting too far below the dot unit
+        val floor = dotUnitSamples * 0.75
+        if (newUnit < floor) {
+            newUnit = floor
+            logger.info("updateSilenceUnit: Corrected new unit to floor value: ${newUnit.roundToInt()}")
+        }
+
+        silenceUnitSamples = newUnit
         logger.info("updateSilenceUnit: old=${oldUnit.roundToInt()}, evidence=${evidenceDuration.roundToInt()}, new=${silenceUnitSamples.roundToInt()}")
     }
 
