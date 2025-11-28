@@ -37,14 +37,14 @@ class PlayTextViewModel @Inject constructor(
 
     val textLiveData: MutableLiveData<String> = MutableLiveData("Hello")
 
-    val frequencyFlow: LiveData<Int> =
+    val frequencyFlow: LiveData<Int> = 
         userPreferencesRepository.getPreferencesFlow().map { it.frequency }
             .shareIn( // Only collect from the booksRepository when the UI is visible
                 viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
                 replay = 1
             ).asLiveData()
-    val wpmFlow: LiveData<Int> =
+    val wpmFlow: LiveData<Int> = 
         userPreferencesRepository.getPreferencesFlow().map { it.wpm }
             .shareIn( // Only collect from the booksRepository when the UI is visible
                 viewModelScope,
@@ -52,7 +52,7 @@ class PlayTextViewModel @Inject constructor(
                 replay = 1
             ).asLiveData()
 
-    val farnsworthWpmFlow: LiveData<Int> =
+    val farnsworthWpmFlow: LiveData<Int> = 
         userPreferencesRepository.getPreferencesFlow().map { it.farnsworthWpm }
             .shareIn( // Only collect from the booksRepository when the UI is visible
                 viewModelScope,
@@ -125,11 +125,19 @@ class PlayTextViewModel @Inject constructor(
             .setTransferMode(AudioTrack.MODE_STATIC)
             .build()
 
+        audioTrack.setPlaybackPositionUpdateListener(object : AudioTrack.OnPlaybackPositionUpdateListener {
+            override fun onMarkerReached(track: AudioTrack) {
+                // Not used
+            }
+
+            override fun onPeriodicNotification(track: AudioTrack) {
+                if (track.playbackHeadPosition >= soundData.size) {
+                    track.release()
+                }
+            }
+        }, null)
+
         audioTrack.write(soundData, 0, soundData.size)
         audioTrack.play()
-
-        // Ensure the sound plays fully
-        Thread.sleep((soundData.size * 1000L / sampleRate))
-        audioTrack.release()
     }
 }
