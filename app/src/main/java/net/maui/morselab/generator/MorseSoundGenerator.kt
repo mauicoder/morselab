@@ -3,6 +3,7 @@ package net.maui.morselab.generator
 import net.maui.morselab.utils.MorseCodeMaps
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import kotlin.math.cos
 import kotlin.math.sin
 
 class MorseSoundGenerator {
@@ -16,13 +17,16 @@ class MorseSoundGenerator {
     ): ByteArray {
         val dotDuration = morseTiming(wpm)
         val dashDuration = 3 * dotDuration
-        val intraCharacterPause = ByteArray(dotDuration * sampleRate / 1000)
+        val intraCharacterPause = createSilence(dotDuration * sampleRate / 1000)
 
         val farnsworthDotDuration = morseTiming(farnsworthWpm)
-        val interCharacterPause = ByteArray(3 * farnsworthDotDuration * sampleRate / 1000)
-        val interWordPause = ByteArray(7 * farnsworthDotDuration * sampleRate / 1000)
+        val interCharacterPause = createSilence(3 * farnsworthDotDuration * sampleRate / 1000)
+        val interWordPause = createSilence(7 * farnsworthDotDuration * sampleRate / 1000)
 
         val morseSoundList = mutableListOf<ByteArray>()
+
+        // Add a small initial pause for clean playback from the start.
+        morseSoundList.add(intraCharacterPause)
 
         text.uppercase().forEach { char ->
             when (char) {
@@ -57,28 +61,37 @@ class MorseSoundGenerator {
         return concatenateSounds(*morseSoundList.toTypedArray())
     }
 
+    private fun createSilence(numSamples: Int): ByteArray {
+        val buffer = ByteArray(numSamples)
+        // For unsigned 8-bit PCM, silence is at the midpoint (128).
+        buffer.fill(128.toByte())
+        return buffer
+    }
+
     private fun generateSineWave(
         frequency: Int,
         durationMs: Int,
         sampleRate: Int,
-        fadeDurationMs: Int = 20
+        fadePercentage: Double = 0.1 // 10% fade-in and fade-out
     ): ByteArray {
         val numSamples = (sampleRate * (durationMs / 1000.0)).toInt()
-        val fadeSamples = (sampleRate * (fadeDurationMs / 1000.0)).toInt()
+        val fadeSamples = (numSamples * fadePercentage).toInt()
         val sample = ByteArray(numSamples)
 
         for (i in sample.indices) {
             val angle = 2.0 * Math.PI * i / (sampleRate / frequency)
             var amplitude = sin(angle) * 127
 
-            // Apply fade-in and fade-out
-            if (i < fadeSamples) {
-                amplitude *= i / fadeSamples.toDouble() // Fade-in
-            } else if (i >= numSamples - fadeSamples) {
-                amplitude *= (numSamples - i - 1) / fadeSamples.toDouble() // Fade-out
+            // Apply cosine-based fade-in and fade-out
+            val envelope = when {
+                i < fadeSamples -> (1 - cos(i * Math.PI / fadeSamples)) / 2
+                i >= numSamples - fadeSamples -> (1 - cos(((numSamples - 1) - i) * Math.PI / fadeSamples)) / 2
+                else -> 1.0
             }
+            amplitude *= envelope
 
-            sample[i] = amplitude.toInt().toByte()
+            // Shift the signed amplitude to unsigned 8-bit PCM range
+            sample[i] = (amplitude + 128).toInt().toByte()
         }
         return sample
     }
