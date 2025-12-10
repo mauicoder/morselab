@@ -141,6 +141,9 @@ class PlayTextViewModel @Inject constructor(
                 put(MediaStore.Audio.Media.DISPLAY_NAME, "morse_output_${System.currentTimeMillis()}.wav")
                 put(MediaStore.Audio.Media.MIME_TYPE, "audio/wav")
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    // --- THE FIX IS HERE ---
+                    // Tell the system to place the file in the public "Downloads" directory.
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/MorseLab")
                     put(MediaStore.Audio.Media.IS_PENDING, 1)
                 }
             }
@@ -159,8 +162,9 @@ class PlayTextViewModel @Inject constructor(
                         resolver.update(uri, contentValues, null, null)
                     }
 
+                    // Switch to the main thread to show the Toast
                     launch(Dispatchers.Main) {
-                        Toast.makeText(context, "File saved to Downloads", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "File saved to Downloads/MorseLab", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error saving file", e)
