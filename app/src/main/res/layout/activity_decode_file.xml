@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".DecodeFileActivity">
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/decodedTextView"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -19,12 +20,13 @@
         android:padding="8dp"
         android:scrollbars="vertical"
         android:text="@string/decoded_text_will_appear_here"
+        android:textColor="@android:color/black"
         app:layout_constraintBottom_toTopOf="@+id/decodeButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/decodeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
