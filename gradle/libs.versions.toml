@@ -1,6 +1,6 @@
 [versions]
 # Plugin Versions
-androidApplication = "8.13.1"
+androidApplication = "8.13.2"
 jetbrainsKotlinAndroid = "2.2.21"
 ksp = "2.2.21-2.0.4"
 protobuf = "0.9.5"
