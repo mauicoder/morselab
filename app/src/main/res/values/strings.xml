@@ -15,4 +15,10 @@
     <string name="morse_code_decoder">Morse Code Decoder</string>
     <string name="start_decoding">Start Decoding</string>
     <string name="decode">Decode</string>
+    <string name="enter_text_to_convert_to_morse_code">Enter text to convert to Morse code</string>
+    <string name="play_morse_code">Play Morse code</string>
+    <string name="save_morse_code">Save Morse code</string>
+    <string name="share_morse_code">Share Morse code</string>
+    <string name="decoded_text_will_appear_here">Decoded text will appear here...</string>
+    <string name="decode_file">Decode File</string>
 </resources>

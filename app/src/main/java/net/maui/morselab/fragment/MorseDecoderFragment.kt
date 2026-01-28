@@ -23,7 +23,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MorseDecoderFragment @Inject constructor(): Fragment() {
 
-    private lateinit var audioRecorder: AudioRecorder
+    private var audioRecorder: AudioRecorder? = null
 
     private lateinit var morseDecoder: MorseDecoder
     private var isDecoding = false
@@ -59,14 +59,6 @@ class MorseDecoderFragment @Inject constructor(): Fragment() {
                 }
             }
             // You can configure other parameters like targetFreq here if needed
-        )
-
-        // 2. Initialize the AudioRecorder, passing it a reference to the decoder's processBuffer method
-        audioRecorder = AudioRecorder(
-            context = requireContext(),
-            sampleRate = 16000, // Ensure these match decoder's expectations
-            blockSize = 512,
-            onBufferReady = morseDecoder::processBuffer // Pass the method reference
         )
     }
 
@@ -132,17 +124,28 @@ class MorseDecoderFragment @Inject constructor(): Fragment() {
         // Clear previous text and reset decoder state
         decodedTextView.text = ""
         morseDecoder.reset()
-        try {
-            // Now you just start the recorder
-            audioRecorder.start()
-        } catch (e: SecurityException) {
-            Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+        audioRecorder = AudioRecorder(
+            context = requireContext(),
+            sampleRate = 16000,
+            blockSize = 512,
+            onBufferReady = morseDecoder::processBuffer
+        ).also {
+            try {
+                // Now you just start the recorder
+                it.start()
+            } catch (e: SecurityException) {
+                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                // If start fails, clean up
+                isDecoding = false
+                audioRecorder = null
+            }
         }
     }
 
     private fun stopDecoder() {
         // And stop the recorder
-        audioRecorder.stop()
+        audioRecorder?.stop()
+        audioRecorder = null
     }
 
     private fun updateUI() {

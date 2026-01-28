@@ -1,10 +1,16 @@
 package net.maui.morselab.viewmodel
 
+import android.content.ContentValues
+import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioTrack
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -60,31 +66,111 @@ class PlayTextViewModel @Inject constructor(
                 replay = 1
             ).asLiveData()
 
+    private val _isReady = MediatorLiveData<Boolean>().apply {
+        value = false
+        val check = { _: Any? ->
+            value = wpmFlow.value != null && frequencyFlow.value != null && farnsworthWpmFlow.value != null
+        }
+        addSource(wpmFlow, check)
+        addSource(frequencyFlow, check)
+        addSource(farnsworthWpmFlow, check)
+    }
+    val isReady: LiveData<Boolean> = _isReady
+
 
     fun playMorseCallback() {
-        if (playJob != null && playJob!!.isActive)
-            return //ignore as a playJob is already running
+        if (playJob?.isActive == true || isReady.value == false) return
+
+        val text = textLiveData.value ?: return
+        val wpm = wpmFlow.value ?: return
+        val farnsworthWpm = farnsworthWpmFlow.value ?: return
+        val frequency = frequencyFlow.value ?: return
+
         playJob = CoroutineScope(context = Dispatchers.Default).launch {
             playMorse(
-                textLiveData.value!!,
-                wpmFlow.value!!,
-                farnsworthWpmFlow.value!!,
-                frequencyFlow.value!!,
+                text,
+                wpm,
+                farnsworthWpm,
+                frequency,
                 SAMPLE_RATE
             )
         }
     }
 
-    fun exportAsWave(activity: FragmentActivity) {
+    fun shareMorseAsWaveFile(activity: FragmentActivity) {
+        if (isReady.value == false) return
+        val text = textLiveData.value ?: return
+        val wpm = wpmFlow.value ?: return
+        val farnsworthWpm = farnsworthWpmFlow.value ?: return
+        val frequency = frequencyFlow.value ?: return
+
         val waveStream = morseSoundGenerator.generateWave(
-            textLiveData.value!!,
-            wpmFlow.value!!,
-            farnsworthWpmFlow.value!!,
-            frequencyFlow.value!!,
+            text,
+            wpm,
+            farnsworthWpm,
+            frequency,
             SAMPLE_RATE
         )
-
         shareFile.shareAsFile(activity, waveStream)
+    }
+
+    fun saveMorseAsWaveFile(context: Context) {
+        if (isReady.value == false) return
+        val text = textLiveData.value ?: return
+        val wpm = wpmFlow.value ?: return
+        val farnsworthWpm = farnsworthWpmFlow.value ?: return
+        val frequency = frequencyFlow.value ?: return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val waveStream = morseSoundGenerator.generateWave(
+                text,
+                wpm,
+                farnsworthWpm,
+                frequency,
+                SAMPLE_RATE
+            )
+
+            val resolver = context.contentResolver
+            val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            } else {
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            }
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Audio.Media.DISPLAY_NAME, "morse_output_${System.currentTimeMillis()}.wav")
+                put(MediaStore.Audio.Media.MIME_TYPE, "audio/wav")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, "Music/MorseLab")
+                    put(MediaStore.Audio.Media.IS_PENDING, 1)
+                }
+            }
+
+            val uri = resolver.insert(collection, contentValues)
+
+            uri?.let {
+                try {
+                    resolver.openOutputStream(it)?.use { outputStream ->
+                        outputStream.write(waveStream)
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        contentValues.clear()
+                        contentValues.put(MediaStore.Audio.Media.IS_PENDING, 0)
+                        resolver.update(uri, contentValues, null, null)
+                    }
+
+                    launch(Dispatchers.Main) {
+                        Toast.makeText(context, "File saved to Music/MorseLab", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error saving file", e)
+                    launch(Dispatchers.Main) {
+                        Toast.makeText(context, "Error saving file", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     private fun playMorse(

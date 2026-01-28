@@ -1,58 +1,40 @@
 package net.maui.morselab.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import dagger.hilt.android.AndroidEntryPoint
+import jakarta.inject.Inject
 import net.maui.morselab.R
 import net.maui.morselab.databinding.FragmentPlayTextBinding
 import net.maui.morselab.viewmodel.PlayTextViewModel
-import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class PlayTextFragment @Inject constructor(): Fragment() {
 
-    private val TAG = "PlayTextFragment"
-    private val viewModel: PlayTextViewModel by activityViewModels()
-    private var _binding: FragmentPlayTextBinding? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // TODO: Use the ViewModel
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    private val viewModel: PlayTextViewModel by viewModels()
+    private lateinit var binding: FragmentPlayTextBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = DataBindingUtil.inflate<FragmentPlayTextBinding>(
-            inflater, R.layout.fragment_play_text, container, false);
-        val binding : FragmentPlayTextBinding = _binding!!
-
-        binding.buttonPlay.setOnClickListener {viewModel.playMorseCallback()
-        }
-        binding.buttonExport.setOnClickListener { viewModel.exportAsWave(activity = requireActivity()) }
-
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_play_text, container, false)
         binding.viewmodel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
+        binding.lifecycleOwner = this
 
-        binding.executePendingBindings()
-        Log.i(TAG, "onCreateView: F: ${viewModel.frequencyFlow.value}; Wpm: ${viewModel.wpmFlow.value}; FWpm: ${viewModel.farnsworthWpmFlow.value}")
+        binding.saveButton.setOnClickListener {
+            viewModel.saveMorseAsWaveFile(requireContext())
+        }
+
+        binding.shareButton.setOnClickListener {
+            viewModel.shareMorseAsWaveFile(requireActivity())
+        }
+
         return binding.root
     }
-
 }
