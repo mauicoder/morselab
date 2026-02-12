@@ -5,12 +5,11 @@
     android:layout_height="match_parent"
     tools:context=".fragment.ConfigFragment">
 
-    <EditText
+    <TextView
         android:id="@+id/labelFrequency"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="text"
         android:text="@string/frequency_hz" />
 
     <TextView
@@ -41,14 +40,13 @@
         android:layout_toEndOf="@id/buttonDecreaseFrequency"
         android:text="@string/plus" />
 
-    <EditText
+    <TextView
         android:id="@+id/labelWpm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/buttonIncreaseFrequency"
         android:labelFor="@+id/textViewWPM"
         android:ems="10"
-        android:inputType="text"
         android:text="@string/wpm" />
 
     <TextView
@@ -79,14 +77,13 @@
         android:layout_toEndOf="@id/buttonDecreaseWPM"
         android:text="@string/plus" />
 
-    <EditText
+    <TextView
         android:id="@+id/labelFarnsworthWpm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/buttonIncreaseWPM"
         android:labelFor="@+id/textViewFarnsworthWPM"
         android:ems="10"
-        android:inputType="text"
         android:text="@string/farnsworth_wpm" />
 
     <TextView

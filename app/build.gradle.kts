@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.ApplicationExtension
 import com.google.protobuf.gradle.id
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -9,7 +10,7 @@ plugins {
     alias(libs.plugins.hilt.android)
 }
 
-android {
+configure<ApplicationExtension> {
     namespace = "net.maui.morselab"
     compileSdk = 36
 

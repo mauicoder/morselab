@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage") // Silences the @Incubating warnings
+
 pluginManagement {
     repositories {
         google {
