@@ -39,8 +39,8 @@ android {
     }
 
 
-    dataBinding {
-        enable = true
+    buildFeatures {
+        viewBinding = true
     }
 
     compileOptions {
@@ -85,7 +85,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.databinding.runtime)
 
     // Testing Navigation
     androidTestImplementation(libs.androidx.navigation.testing)

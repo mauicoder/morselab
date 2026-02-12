@@ -1,11 +1,9 @@
 package net.maui.morselab.decoder
 
-import androidx.compose.ui.text.toUpperCase
 import net.maui.morselab.utils.AudioUtils
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
-import java.util.Locale
 import java.util.Locale.getDefault
 import kotlin.math.min
 

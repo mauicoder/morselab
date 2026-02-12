@@ -2,7 +2,6 @@ package net.maui.morselab
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
 import net.maui.morselab.databinding.ActivityMainBinding
@@ -30,7 +29,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         binding.bottomNavigationView.setOnItemSelectedListener {
             when(it.itemId) {

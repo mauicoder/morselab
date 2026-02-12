@@ -1,31 +1,61 @@
 package net.maui.morselab.fragment
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import jakarta.inject.Inject
-import net.maui.morselab.R
 import net.maui.morselab.databinding.FragmentPlayTextBinding
 import net.maui.morselab.viewmodel.PlayTextViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PlayTextFragment @Inject constructor(): Fragment() {
 
     private val viewModel: PlayTextViewModel by viewModels()
-    private lateinit var binding: FragmentPlayTextBinding
+    private var _binding: FragmentPlayTextBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_play_text, container, false)
-        binding.viewmodel = viewModel
-        binding.lifecycleOwner = this
+        _binding = FragmentPlayTextBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Manual two-way binding for textLiveData
+        viewModel.textLiveData.observe(viewLifecycleOwner) { text ->
+            if (binding.editText.text.toString() != text) {
+                binding.editText.setText(text)
+            }
+        }
+
+        binding.editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.textLiveData.value = s.toString()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        // Observe isReady to update button states
+        viewModel.isReady.observe(viewLifecycleOwner) { isReady ->
+            binding.playButton.isEnabled = isReady
+            binding.saveButton.isEnabled = isReady
+            binding.shareButton.isEnabled = isReady
+        }
+
+        binding.playButton.setOnClickListener {
+            viewModel.playMorseCallback()
+        }
 
         binding.saveButton.setOnClickListener {
             viewModel.saveMorseAsWaveFile(requireContext())
@@ -34,7 +64,10 @@ class PlayTextFragment @Inject constructor(): Fragment() {
         binding.shareButton.setOnClickListener {
             viewModel.shareMorseAsWaveFile(requireActivity())
         }
+    }
 
-        return binding.root
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -7,15 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
-import net.maui.morselab.R
+import net.maui.morselab.databinding.FragmentMorseDecoderBinding
 import net.maui.morselab.decoder.MorseDecoder
 import net.maui.morselab.recorder.AudioRecorder
 import javax.inject.Inject
@@ -28,9 +25,8 @@ class MorseDecoderFragment @Inject constructor(): Fragment() {
     private lateinit var morseDecoder: MorseDecoder
     private var isDecoding = false
 
-    // --- UI Views ---
-    private lateinit var startStopButton: Button
-    private lateinit var decodedTextView: TextView
+    private var _binding: FragmentMorseDecoderBinding? = null
+    private val binding get() = _binding!!
 
     // The ActivityResultLauncher for permission requests.
     @SuppressLint("MissingPermission")
@@ -55,33 +51,35 @@ class MorseDecoderFragment @Inject constructor(): Fragment() {
                 // The decoder runs on a background thread.
                 // We must update the UI on the main thread.
                 activity?.runOnUiThread {
-                    decodedTextView.append(decodedText)
+                    binding.textViewDecoded.append(decodedText)
                 }
             }
             // You can configure other parameters like targetFreq here if needed
         )
     }
 
-    @SuppressLint("MissingPermission")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_morse_decoder, container, false)
-        startStopButton = view.findViewById(R.id.button_start_stop)
-        decodedTextView = view.findViewById(R.id.text_view_decoded)
+    ): View {
+        _binding = FragmentMorseDecoderBinding.inflate(inflater, container, false)
 
         // The button click now triggers the permission check flow.
-        startStopButton.setOnClickListener {
+        binding.buttonStartStop.setOnClickListener {
             checkForPermissionAndStart()
         }
 
         updateUI()
-        return view
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     // This function is the single "safe" entry point from the UI.
-    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
+    @SuppressLint("MissingPermission")
     private fun checkForPermissionAndStart() {
         when {
             // Check if the permission is already granted.
@@ -104,7 +102,7 @@ class MorseDecoderFragment @Inject constructor(): Fragment() {
         }
     }
 
-    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
+    @SuppressLint("MissingPermission")
     // This is our new "safe" function. It has no annotation and can be called freely
     // from within our permission-checking logic.
     private fun safelyToggleDecoder() {
@@ -119,10 +117,10 @@ class MorseDecoderFragment @Inject constructor(): Fragment() {
         updateUI()
     }
 
-    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
+    @SuppressLint("MissingPermission")
     private fun startDecoder() {
         // Clear previous text and reset decoder state
-        decodedTextView.text = ""
+        binding.textViewDecoded.text = ""
         morseDecoder.reset()
         audioRecorder = AudioRecorder(
             context = requireContext(),
@@ -149,8 +147,8 @@ class MorseDecoderFragment @Inject constructor(): Fragment() {
     }
 
     private fun updateUI() {
-        startStopButton.text = if (isDecoding) "Stop Decoding" else "Start Decoding"
-        decodedTextView.hint = if (isDecoding) "Listening for Morse code..." else "Press 'Start' to begin."
+        binding.buttonStartStop.text = if (isDecoding) "Stop Decoding" else "Start Decoding"
+        binding.textViewDecoded.hint = if (isDecoding) "Listening for Morse code..." else "Press 'Start' to begin."
     }
 
     override fun onStop() {
