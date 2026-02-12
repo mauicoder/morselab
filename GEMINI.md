@@ -21,6 +21,9 @@
 - **Concurrency:** Always use `viewModelScope` for coroutines in ViewModels.
 
 ## 4. Current Objectives
+- [x] Implement a Morse code encoder -> text to audio.
+- [x] Implement a Morse code decoder -> audio to text
+- [ ] Improve the morse code decoder.
 - [ ] Refine the Morse code audio generation logic.
 - [ ] Implement a real-time visualizer for the signal.
 - [ ] Expand unit test coverage for complex Morse sequences.
