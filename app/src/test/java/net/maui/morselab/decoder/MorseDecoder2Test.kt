@@ -41,7 +41,7 @@ class MorseDecoder2Test {
         val audioFloatArray = AudioUtils.bytesToFloat(wavFile.audioData)
 
         // 4. Feed the audio data to the decoder
-        feedDataToDecoder(decoder, audioFloatArray, wavFile.sampleRate)
+        feedDataToDecoder(decoder, audioFloatArray)
 
         // 5. Assert the final decoded string is correct
         // Using trim() and replace() to make the assertion robust against extra whitespace.
@@ -70,7 +70,7 @@ class MorseDecoder2Test {
         val audioFloatArray = AudioUtils.bytesToFloat(wavFile.audioData)
 
         // 4. Feed the audio data to the decoder
-        feedDataToDecoder(decoder, audioFloatArray, wavFile.sampleRate)
+        feedDataToDecoder(decoder, audioFloatArray)
 
         // 5. Assert the final decoded string is correct
         // Using trim() and replace() to make the assertion robust against extra whitespace.
@@ -99,7 +99,7 @@ class MorseDecoder2Test {
         val audioFloatArray = AudioUtils.bytesToFloat(wavFile.audioData)
 
         // 4. Feed the audio data to the decoder
-        feedDataToDecoder(decoder, audioFloatArray, wavFile.sampleRate)
+        feedDataToDecoder(decoder, audioFloatArray)
 
         // 5. Assert the final decoded string is correct
         // Using trim() and replace() to make the assertion robust against extra whitespace.
@@ -110,7 +110,7 @@ class MorseDecoder2Test {
      * Helper function to chunk a larger audio array and feed it to the decoder.
      * This version is fully deterministic and does not rely on Thread.sleep().
      */
-    private fun feedDataToDecoder(decoder: MorseDecoder, audioData: FloatArray, sampleRate: Int) {
+    private fun feedDataToDecoder(decoder: MorseDecoder, audioData: FloatArray) {
         var offset = 0
         while (offset < audioData.size) {
             val remaining = audioData.size - offset
