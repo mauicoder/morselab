@@ -48,10 +48,10 @@ configure<ApplicationExtension> {
         sourceCompatibility = JavaVersion.VERSION_18
         targetCompatibility = JavaVersion.VERSION_18
     }
-    kotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_18
-        }
+}
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_18
     }
 }
 
