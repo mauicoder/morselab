@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlayTextViewModel @Inject constructor(
-    private val userPreferencesRepository: UserPreferencesRepository
+    userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val SAMPLE_RATE = 44100
