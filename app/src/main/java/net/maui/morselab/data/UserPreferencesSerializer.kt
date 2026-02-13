@@ -2,6 +2,8 @@ package net.maui.morselab.data
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream
@@ -22,6 +24,11 @@ object UserPreferencesSerializer : Serializer<UserPreferences> {
     }
 
     override suspend fun writeTo(t: UserPreferences, output: OutputStream) {
-        output.write(Json.encodeToString(UserPreferences.serializer(), t).encodeToByteArray())
+        // Move the blocking I/O operation to the IO dispatcher
+        withContext(Dispatchers.IO) {
+            output.write(
+                Json.encodeToString(UserPreferences.serializer(), t).encodeToByteArray()
+            )
+        }
     }
 }
