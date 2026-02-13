@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
@@ -49,11 +48,13 @@ configure<ApplicationExtension> {
         targetCompatibility = JavaVersion.VERSION_18
     }
 }
+
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_18
+        jvmTarget.set(JvmTarget.JVM_18)
     }
 }
+
 
 dependencies {
 
