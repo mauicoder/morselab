@@ -2,7 +2,12 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.MorseLab" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
+        <!-- These are fallbacks for devices that don't support Dynamic Colors (Android <12) -->
         <item name="colorPrimary">@color/my_light_primary</item>
+
+        <!-- Add standard M3 surface/background to ensure consistency -->
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.MorseLab" parent="Base.Theme.MorseLab" />
