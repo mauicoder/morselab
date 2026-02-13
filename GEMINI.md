@@ -4,7 +4,7 @@
 
 ## 1. Core Tech Stack
 - **Language:** Kotlin 2.x (Primary).
-- **Build System:** AGP 9.0 (Built-in Kotlin enabled).
+- **Build System:** AGP 9.0.1 (Built-in Kotlin enabled).
 - **UI Framework:** Transitional from ViewBinding to 100% Jetpack Compose.
 - **Data Persistence:** Jetpack DataStore using **Kotlinx Serialization (JSON)**.
 - **Asynchronous Logic:** Kotlin Coroutines and Flow (`StateFlow` / `SharedFlow`).

@@ -1,6 +1,6 @@
 [versions]
 # Plugin Versions
-androidApplication = "9.0.0"
+androidApplication = "9.0.1"
 kotlin = "2.3.10"
 # Add this version for JSON support
 kotlinx-serialization = "1.10.0"

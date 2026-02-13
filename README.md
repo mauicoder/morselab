@@ -28,9 +28,9 @@ The project follows **Clean Architecture** principles and the **MVVM** (Model-Vi
 
 ## 📋 Requirements & Environment
 - **Minimum SDK:** Android 7.0 (API 24, Nougat)
-- **IDE:** Android Studio Ladybug Feature Drop | 2024.2.2 or newer
-- **Gradle:** 8.11+
-- **Android Gradle Plugin (AGP):** 9.0.0-alpha or newer
+- **IDE:** Android Studio Panda 1 | 2025.3.1 or newer
+- **Gradle:** 9.3.1+
+- **Android Gradle Plugin (AGP):** 9.0.1 or newer
 
 ## 🏗 Setup & Build
 1. Clone the repository.
