@@ -1,17 +1,47 @@
 # MorseLab
-Android App written in kotlin to experiment some functionalities for learning/improving morse code
 
-## Supported Android
-Android 7.0 Nougat api version 24
+MorseLab is an experimental Android application designed for learning, improving, and experimenting with Morse code. It focuses on high-fidelity audio generation and modern Android development practices.
 
-Android Studio Ladybug Feature Drop | 2024.2.2
+## 🚀 Modern Tech Stack
+- **Language:** Kotlin 2.x (Primary)
+- **UI Framework:** Jetpack Compose (100% Target) / ViewBinding
+- **Build System:** Gradle Kotlin DSL with AGP 9.0 (Built-in Kotlin support)
+- **Asynchronous Logic:** Kotlin Coroutines & Flow
+- **Dependency Injection:** Hilt (Dagger)
+- **Data Persistence:** Jetpack DataStore with Kotlinx Serialization (JSON)
+- **Processing:** KSP (Kotlin Symbol Processing)
 
-## Features
-- generate morse wave audio from text
-- share wave audio from text
-- configurable parameters
-  - Frequency: default 800 Hz
-  - WPM (Words per minute): default 20
-  - Farnsworth WPM (actual words per minute): default 20
+## ✨ Features
+- **Text to Morse Audio:** Generate high-quality wave audio from text strings.
+- **Audio Sharing:** Export and share generated Morse wave files.
+- **Configurable Parameters:**
+  - **Frequency:** Default 800 Hz (Customizable)
+  - **WPM (Words per minute):** Default 20
+  - **Farnsworth WPM:** Control spacing independently for effective learning.
+- **Reactive Settings:** Preferences are updated in real-time across the app without requiring restarts.
 
-  
+## 🛠 Architecture
+The project follows **Clean Architecture** principles and the **MVVM** (Model-View-ViewModel) pattern:
+- **UI Layer:** Jetpack Compose for a reactive UI.
+- **Domain Layer:** Morse encoding/decoding logic and business rules.
+- **Data Layer:** Reactive repository pattern using DataStore for persistent user preferences.
+
+## 📋 Requirements & Environment
+- **Minimum SDK:** Android 7.0 (API 24, Nougat)
+- **IDE:** Android Studio Ladybug Feature Drop | 2024.2.2 or newer
+- **Gradle:** 8.11+
+- **Android Gradle Plugin (AGP):** 9.0.0-alpha or newer
+
+## 🏗 Setup & Build
+1. Clone the repository.
+2. Ensure you have the latest stable/canary version of Android Studio.
+3. The project uses **Version Catalogs** (`libs.versions.toml`) for dependency management.
+4. Built-in Kotlin is enabled via `gradle.properties`:
+
+## 🛤 Roadmap
+- [x] Implement Morse code encoder (Text ➔ Audio)
+- [x] Migrate Protobuf to Kotlin Serialization
+- [x] Implement real-time preference updates
+- [ ] Refine Morse code decoder (Audio ➔ Text)
+- [ ] Real-time signal visualizer
+- [ ] Expand unit test coverage for complex Morse sequences
