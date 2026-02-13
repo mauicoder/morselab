@@ -8,13 +8,16 @@ import kotlin.math.sin
 
 class MorseSoundGenerator {
 
+    /**
+     * Generates a 16-bit PCM Mono audio stream for the given text.
+     */
     fun generate(
         text: String,
         wpm: Int,
         farnsworthWpm: Int,
         frequency: Int,
         sampleRate: Int
-    ): ByteArray {
+    ): ShortArray {
         val dotDuration = morseTiming(wpm)
         val dashDuration = 3 * dotDuration
         val intraCharacterPause = createSilence(dotDuration * sampleRate / 1000)
@@ -23,7 +26,7 @@ class MorseSoundGenerator {
         val interCharacterPause = createSilence(3 * farnsworthDotDuration * sampleRate / 1000)
         val interWordPause = createSilence(7 * farnsworthDotDuration * sampleRate / 1000)
 
-        val morseSoundList = mutableListOf<ByteArray>()
+        val morseSoundList = mutableListOf<ShortArray>()
 
         // Add a small initial pause for clean playback from the start.
         morseSoundList.add(intraCharacterPause)
@@ -61,11 +64,8 @@ class MorseSoundGenerator {
         return concatenateSounds(*morseSoundList.toTypedArray())
     }
 
-    private fun createSilence(numSamples: Int): ByteArray {
-        val buffer = ByteArray(numSamples)
-        // For unsigned 8-bit PCM, silence is at the midpoint (128).
-        buffer.fill(128.toByte())
-        return buffer
+    private fun createSilence(numSamples: Int): ShortArray {
+        return ShortArray(numSamples) // Shorts initialized to 0 (silence in 16-bit PCM)
     }
 
     private fun generateSineWave(
@@ -73,29 +73,31 @@ class MorseSoundGenerator {
         durationMs: Int,
         sampleRate: Int,
         fadePercentage: Double = 0.1 // 10% fade-in and fade-out
-    ): ByteArray {
+    ): ShortArray {
         val numSamples = (sampleRate * (durationMs / 1000.0)).toInt()
         val fadeSamples = (numSamples * fadePercentage).toInt()
-        val sample = ByteArray(numSamples)
+        val sample = ShortArray(numSamples)
 
         for (i in sample.indices) {
-            val angle = 2.0 * Math.PI * i / (sampleRate / frequency)
-            var amplitude = sin(angle) * 127
+            val angle = 2.0 * Math.PI * i * frequency / sampleRate
+            var amplitude = sin(angle) * 32767.0
 
-            // Apply cosine-based fade-in and fade-out
+            // Apply cosine-based fade-in and fade-out for smoothing (Hanning envelope)
             val envelope = when {
-                i < fadeSamples -> (1 - cos(i * Math.PI / fadeSamples)) / 2
-                i >= numSamples - fadeSamples -> (1 - cos(((numSamples - 1) - i) * Math.PI / fadeSamples)) / 2
+                i < fadeSamples -> (1.0 - cos(i * Math.PI / fadeSamples)) / 2.0
+                i >= numSamples - fadeSamples -> (1.0 - cos(((numSamples - 1) - i) * Math.PI / fadeSamples)) / 2.0
                 else -> 1.0
             }
             amplitude *= envelope
 
-            // Shift the signed amplitude to unsigned 8-bit PCM range
-            sample[i] = (amplitude + 128).toInt().toByte()
+            sample[i] = amplitude.toInt().toShort()
         }
         return sample
     }
 
+    /**
+     * Generates a complete .WAV file (header + 16-bit PCM data)
+     */
     fun generateWave(
         text: String,
         wpm: Int,
@@ -103,18 +105,25 @@ class MorseSoundGenerator {
         frequency: Int,
         sampleRate: Int
     ): ByteArray {
-        val morseCodeSound = generate(text, wpm, farnsworthWpm, frequency, sampleRate)
+        val morseCodeShorts = generate(text, wpm, farnsworthWpm, frequency, sampleRate)
+        val dataSizeInBytes = morseCodeShorts.size * 2
 
-        val waveStream = createWavHeader(morseCodeSound.size, sampleRate)
-        return waveStream + morseCodeSound
+        val byteBuffer = ByteBuffer.allocate(44 + dataSizeInBytes).order(ByteOrder.LITTLE_ENDIAN)
+        
+        // Add WAV Header
+        createWavHeader(byteBuffer, dataSizeInBytes, sampleRate)
+        
+        // Add PCM Data
+        for (s in morseCodeShorts) {
+            byteBuffer.putShort(s)
+        }
+
+        return byteBuffer.array()
     }
 
-    private fun createWavHeader(dataSize: Int, sampleRate: Int): ByteArray {
+    private fun createWavHeader(buffer: ByteBuffer, dataSize: Int, sampleRate: Int) {
         val totalDataLen = dataSize + 36
-        val byteRate = sampleRate * 1 * 8 / 8 // sampleRate * numChannels * bitsPerSample/8
-
-        val header = ByteArray(44)
-        val buffer = ByteBuffer.wrap(header).order(ByteOrder.LITTLE_ENDIAN)
+        val byteRate = sampleRate * 1 * 16 / 8 // sampleRate * numChannels * bitsPerSample/8
 
         buffer.put("RIFF".toByteArray())             // RIFF header
         buffer.putInt(totalDataLen)                  // Total size of the file minus 8 bytes
@@ -125,18 +134,16 @@ class MorseSoundGenerator {
         buffer.putShort(1)                           // Number of channels (1 for mono)
         buffer.putInt(sampleRate)                    // Sample rate
         buffer.putInt(byteRate)                      // Byte rate
-        buffer.putShort(1)                           // Block align (numChannels * bitsPerSample/8)
-        buffer.putShort(8)                           // Bits per sample (8 bits)
+        buffer.putShort(2)                           // Block align (numChannels * bitsPerSample/8)
+        buffer.putShort(16)                          // Bits per sample (16 bits)
 
         buffer.put("data".toByteArray())             // Data chunk header
         buffer.putInt(dataSize)                      // Size of data section
-
-        return header
     }
 
-    private fun concatenateSounds(vararg sounds: ByteArray): ByteArray {
+    private fun concatenateSounds(vararg sounds: ShortArray): ShortArray {
         val totalLength = sounds.sumOf { it.size }
-        val result = ByteArray(totalLength)
+        val result = ShortArray(totalLength)
         var offset = 0
         for (sound in sounds) {
             System.arraycopy(sound, 0, result, offset, sound.size)

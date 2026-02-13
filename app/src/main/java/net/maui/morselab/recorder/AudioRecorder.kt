@@ -25,16 +25,19 @@ class AudioRecorder(
         sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT
     ).coerceAtLeast(blockSize * 2)
 
-    // Recorder is initialized lazily to allow for permission checks before creation.
+    // Recorder is initialized lazily using the modern Builder (API 26+)
     private val recorder: AudioRecord by lazy {
-        // This is safe because start() checks for permission before this is ever accessed.
-        AudioRecord(
-            MediaRecorder.AudioSource.MIC,
-            sampleRate,
-            AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_16BIT,
-            audioBufSize
-        )
+        AudioRecord.Builder()
+            .setAudioSource(MediaRecorder.AudioSource.MIC)
+            .setAudioFormat(
+                AudioFormat.Builder()
+                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                    .setSampleRate(sampleRate)
+                    .setChannelMask(AudioFormat.CHANNEL_IN_MONO)
+                    .build()
+            )
+            .setBufferSizeInBytes(audioBufSize)
+            .build()
     }
 
     @Volatile
