@@ -11,12 +11,12 @@ plugins {
 
 configure<ApplicationExtension> {
     namespace = "net.maui.morselab"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "net.maui.morselab"
-        minSdk = 24
-        targetSdk = 36
+        minSdk = 26
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
