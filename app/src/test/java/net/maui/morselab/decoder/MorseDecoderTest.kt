@@ -4,7 +4,6 @@ import net.maui.morselab.generator.MorseSoundGenerator
 import net.maui.morselab.utils.AudioUtils
 import org.junit.Assert
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
 import kotlin.math.min
 
@@ -37,16 +36,16 @@ class MorseDecoderTest {
         decoder.reset()
 
 
-        val audioByteArray = morseSoundGenerator.generate(
-            text = "$text ", // Add trailing space for word gap
+        val audioShortArray = morseSoundGenerator.generate(
+            text = "$text ",
             wpm = wpm,
             farnsworthWpm = farnsworthWpm,
             frequency = targetFreq.toInt(),
             sampleRate = 16000
         )
 
-        val audioFloatArray = AudioUtils.bytesToFloat(byteArray = audioByteArray)
-        feedDataToDecoder(decoder, audioFloatArray, 16000)
+        val audioFloatArray = AudioUtils.shortsToFloat(audioShortArray)
+        feedDataToDecoder(decoder, audioFloatArray)
 
         // The assertion is now robust against leading/trailing spaces from the decoder
         assertEquals(text, decodedString.trim())
@@ -80,7 +79,7 @@ class MorseDecoderTest {
         decoder.reset()
 
         val audioFloatArray = AudioUtils.bytesToFloat(wavFile.audioData)
-        feedDataToDecoder(decoder, audioFloatArray, wavFile.sampleRate)
+        feedDataToDecoder(decoder, audioFloatArray)
 
         // Make the assertion robust against extra spaces
         assertEquals("HI SOS", decodedString.trim())
@@ -90,7 +89,7 @@ class MorseDecoderTest {
     /**
      * Helper function to chunk a larger audio array into blocks and pass them to the decoder.
      */
-    private fun feedDataToDecoder(decoder: MorseDecoder, audioData: FloatArray, sampleRate: Int) {
+    private fun feedDataToDecoder(decoder: MorseDecoder, audioData: FloatArray) {
         var offset = 0
         while (offset < audioData.size) {
             val remaining = audioData.size - offset

@@ -1,7 +1,9 @@
 package net.maui.morselab.utils
 
 import java.nio.ByteBuffer
-import java.nio.ByteOrder/**
+import java.nio.ByteOrder
+
+/**
  * A singleton utility object for handling common audio data conversions.
  * Provides consistent, overloaded methods for both creating new arrays (convenience)
  * and filling existing ones (performance).
@@ -14,7 +16,7 @@ object AudioUtils {
      * Converts a ByteArray of 16-bit PCM audio into a new, normalized FloatArray.
      * This version allocates a new FloatArray.
      *
-     * @param byteArray The raw byte data.
+     * @param byteArray The raw byte data (16-bit PCM).
      * @return A new FloatArray where each sample is in the range [-1.0, 1.0].
      */
     fun bytesToFloat(byteArray: ByteArray): FloatArray {
@@ -27,7 +29,7 @@ object AudioUtils {
      * Converts a ByteArray of 16-bit PCM audio into a provided destination FloatArray.
      * This high-performance version avoids allocation. The destination array must have enough capacity.
      *
-     * @param source The raw byte data.
+     * @param source The raw byte data (16-bit PCM).
      * @param destination The FloatArray to write the converted samples into.
      */
     fun bytesToFloat(source: ByteArray, destination: FloatArray) {
