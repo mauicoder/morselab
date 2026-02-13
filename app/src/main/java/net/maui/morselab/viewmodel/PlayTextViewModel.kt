@@ -10,29 +10,27 @@ import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import net.maui.morselab.ShareFile
-import net.maui.morselab.data.UserPreferencesRepositoryImpl
+import net.maui.morselab.data.UserPreferences
+import net.maui.morselab.data.UserPreferencesRepository
 import net.maui.morselab.generator.MorseSoundGenerator
 import javax.inject.Inject
 
 @HiltViewModel
 class PlayTextViewModel @Inject constructor(
-    userPreferencesRepository: UserPreferencesRepositoryImpl
-) : ViewModel(
-) {
+    private val userPreferencesRepository: UserPreferencesRepository
+) : ViewModel() {
 
     private val SAMPLE_RATE = 44100
     private val TAG = "PlayTextViewModel"
@@ -43,90 +41,65 @@ class PlayTextViewModel @Inject constructor(
 
     val textLiveData: MutableLiveData<String> = MutableLiveData("Hello")
 
-    val frequencyFlow: LiveData<Int> = 
-        userPreferencesRepository.getPreferencesFlow().map { it.frequency }
-            .shareIn( // Only collect from the booksRepository when the UI is visible
-                viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                replay = 1
-            ).asLiveData()
-    val wpmFlow: LiveData<Int> = 
-        userPreferencesRepository.getPreferencesFlow().map { it.wpm }
-            .shareIn( // Only collect from the booksRepository when the UI is visible
-                viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                replay = 1
-            ).asLiveData()
+    val userPreferences: StateFlow<UserPreferences> = userPreferencesRepository.userPreferences
 
-    val farnsworthWpmFlow: LiveData<Int> = 
-        userPreferencesRepository.getPreferencesFlow().map { it.farnsworthWpm }
-            .shareIn( // Only collect from the booksRepository when the UI is visible
-                viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                replay = 1
-            ).asLiveData()
-
-    private val _isReady = MediatorLiveData<Boolean>().apply {
-        value = false
-        val check = { _: Any? ->
-            value = wpmFlow.value != null && frequencyFlow.value != null && farnsworthWpmFlow.value != null
-        }
-        addSource(wpmFlow, check)
-        addSource(frequencyFlow, check)
-        addSource(farnsworthWpmFlow, check)
-    }
-    val isReady: LiveData<Boolean> = _isReady
-
+    val isReady: LiveData<Boolean> = userPreferences.map { true }.asLiveData()
 
     fun playMorseCallback() {
-        if (playJob?.isActive == true || isReady.value == false) return
+        if (playJob?.isActive == true) {
+            Log.w(TAG, "Playback already in progress, ignoring request.")
+            return
+        }
 
+        val prefs = userPreferences.value
         val text = textLiveData.value ?: return
-        val wpm = wpmFlow.value ?: return
-        val farnsworthWpm = farnsworthWpmFlow.value ?: return
-        val frequency = frequencyFlow.value ?: return
-
-        playJob = CoroutineScope(context = Dispatchers.Default).launch {
-            playMorse(
-                text,
-                wpm,
-                farnsworthWpm,
-                frequency,
-                SAMPLE_RATE
-            )
+        
+        Log.i(TAG, "playMorseCallback: text=$text, prefs=$prefs")
+        
+        playJob = viewModelScope.launch(Dispatchers.Default) {
+            Log.i(TAG, "Playback coroutine started.")
+            try {
+                val soundData = morseSoundGenerator.generate(
+                    text,
+                    prefs.wpm,
+                    prefs.farnsworthWpm,
+                    prefs.frequency,
+                    SAMPLE_RATE
+                )
+                Log.i(TAG, "Sound generated, size=${soundData.size} bytes.")
+                playSound(soundData, SAMPLE_RATE)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in playback coroutine", e)
+            } finally {
+                Log.i(TAG, "Playback coroutine finished.")
+            }
         }
     }
 
     fun shareMorseAsWaveFile(activity: FragmentActivity) {
-        if (isReady.value == false) return
+        val prefs = userPreferences.value
         val text = textLiveData.value ?: return
-        val wpm = wpmFlow.value ?: return
-        val farnsworthWpm = farnsworthWpmFlow.value ?: return
-        val frequency = frequencyFlow.value ?: return
 
         val waveStream = morseSoundGenerator.generateWave(
             text,
-            wpm,
-            farnsworthWpm,
-            frequency,
+            prefs.wpm,
+            prefs.farnsworthWpm,
+            prefs.frequency,
             SAMPLE_RATE
         )
         shareFile.shareAsFile(activity, waveStream)
     }
 
     fun saveMorseAsWaveFile(context: Context) {
-        if (isReady.value == false) return
+        val prefs = userPreferences.value
         val text = textLiveData.value ?: return
-        val wpm = wpmFlow.value ?: return
-        val farnsworthWpm = farnsworthWpmFlow.value ?: return
-        val frequency = frequencyFlow.value ?: return
 
         viewModelScope.launch(Dispatchers.IO) {
             val waveStream = morseSoundGenerator.generateWave(
                 text,
-                wpm,
-                farnsworthWpm,
-                frequency,
+                prefs.wpm,
+                prefs.farnsworthWpm,
+                prefs.frequency,
                 SAMPLE_RATE
             )
 
@@ -173,26 +146,13 @@ class PlayTextViewModel @Inject constructor(
         }
     }
 
-    private fun playMorse(
-        text: String,
-        wpm: Int,
-        farnsworthWpm: Int,
-        frequency: Int,
-        sampleRate: Int
-    ) {
-
-        Log.i(TAG, "playMorse( $text $wpm $farnsworthWpm $frequency $sampleRate)")
-        val morseCodeSound = morseSoundGenerator.generate(
-            text,
-            wpm,
-            farnsworthWpm,
-            frequency,
-            sampleRate
+    private suspend fun playSound(soundData: ByteArray, sampleRate: Int) {
+        val minBufferSize = AudioTrack.getMinBufferSize(
+            sampleRate,
+            AudioFormat.CHANNEL_OUT_MONO,
+            AudioFormat.ENCODING_PCM_8BIT
         )
-        playSound(morseCodeSound, sampleRate)
-    }
-
-    private fun playSound(soundData: ByteArray, sampleRate: Int) {
+        
         val audioTrack = AudioTrack.Builder()
             .setAudioAttributes(
                 android.media.AudioAttributes.Builder()
@@ -207,23 +167,32 @@ class PlayTextViewModel @Inject constructor(
                     .setEncoding(AudioFormat.ENCODING_PCM_8BIT)
                     .build()
             )
-            .setBufferSizeInBytes(soundData.size)
-            .setTransferMode(AudioTrack.MODE_STATIC)
+            .setBufferSizeInBytes(maxOf(minBufferSize, soundData.size))
+            .setTransferMode(AudioTrack.MODE_STREAM)
             .build()
 
-        audioTrack.setPlaybackPositionUpdateListener(object : AudioTrack.OnPlaybackPositionUpdateListener {
-            override fun onMarkerReached(track: AudioTrack) {
-                // Not used
+        try {
+            audioTrack.play()
+            var offset = 0
+            while (offset < soundData.size) {
+                val bytesToWrite = minOf(soundData.size - offset, minBufferSize)
+                val result = audioTrack.write(soundData, offset, bytesToWrite)
+                if (result <= 0) break
+                offset += result
             }
-
-            override fun onPeriodicNotification(track: AudioTrack) {
-                if (track.playbackHeadPosition >= soundData.size) {
-                    track.release()
-                }
+            
+            // Wait for the hardware to finish playing the buffered data
+            val totalFrames = soundData.size // 1 byte per frame for 8-bit mono
+            while (audioTrack.playbackHeadPosition < totalFrames) {
+                delay(50)
             }
-        }, null)
-
-        audioTrack.write(soundData, 0, soundData.size)
-        audioTrack.play()
+            Log.i(TAG, "Playback finished physically.")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error during AudioTrack playback", e)
+        } finally {
+            audioTrack.stop()
+            audioTrack.release()
+            Log.i(TAG, "AudioTrack released.")
+        }
     }
 }

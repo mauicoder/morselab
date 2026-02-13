@@ -1,7 +1,11 @@
 [versions]
 # Plugin Versions
 androidApplication = "9.0.0"
-jetbrainsKotlinAndroid = "2.3.0"
+jetbrainsKotlinAndroid = "2.3.10"
+kotlin = "2.3.10"
+# Add this version for JSON support
+kotlinx-serialization = "1.8.0"
+
 ksp = "2.3.2"    # Update to the new standalone format from "2.2.21-2.0.4"
 protobuf = "0.9.6"
 hilt = "2.59"
@@ -41,6 +45,9 @@ androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support
 # Coroutines
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 
+# Add this library (Replace the Protobuf ones once migration is done)
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
 # DataStore & Protobuf
 androidx-datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
 protobuf-javalite = { group = "com.google.protobuf", name = "protobuf-javalite", version.ref = "protobufJavalite" }
@@ -76,5 +83,11 @@ androidx-navigation-testing = { group = "androidx.navigation", name = "navigatio
 android-application = { id = "com.android.application", version.ref = "androidApplication" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "jetbrainsKotlinAndroid" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+# Add the Serialization plugin (required for @Serializable)
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+# Add the Compose compiler plugin (required for Kotlin 2.x)
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

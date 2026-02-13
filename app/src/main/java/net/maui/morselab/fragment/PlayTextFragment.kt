@@ -7,8 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import net.maui.morselab.databinding.FragmentPlayTextBinding
 import net.maui.morselab.viewmodel.PlayTextViewModel
 import javax.inject.Inject
@@ -16,7 +20,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PlayTextFragment @Inject constructor(): Fragment() {
 
-    private val viewModel: PlayTextViewModel by viewModels()
+    private val viewModel: PlayTextViewModel by activityViewModels()
     private var _binding: FragmentPlayTextBinding? = null
     private val binding get() = _binding!!
 
@@ -51,6 +55,14 @@ class PlayTextFragment @Inject constructor(): Fragment() {
             binding.playButton.isEnabled = isReady
             binding.saveButton.isEnabled = isReady
             binding.shareButton.isEnabled = isReady
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.userPreferences.collect { prefs ->
+                    // Update any labels that show current settings
+                }
+            }
         }
 
         binding.playButton.setOnClickListener {

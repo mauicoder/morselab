@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,22 +13,30 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import net.maui.morselab.datastore.UserPreferences
 import javax.inject.Singleton
 
-private const val DATA_STORE_FILE_NAME = "user_prefs.pb"
+private const val DATA_STORE_FILE_NAME = "user_prefs.json"
 
 @InstallIn(SingletonComponent::class)
 @Module
-class DataStoreModule {
+abstract class DataStoreModule {
+
+    @Binds
     @Singleton
-    @Provides
-    fun provideProtoDataStore(@ApplicationContext appContext: Context): DataStore<UserPreferences> {
-        return DataStoreFactory.create(
-            serializer = UserPreferencesSerializer,
-            produceFile = { appContext.dataStoreFile(DATA_STORE_FILE_NAME) },
-            corruptionHandler = null,
-            scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-        )
+    abstract fun bindUserPreferencesRepository(
+        userPreferencesRepositoryImpl: UserPreferencesRepositoryImpl
+    ): UserPreferencesRepository
+
+    companion object {
+        @Singleton
+        @Provides
+        fun provideDataStore(@ApplicationContext appContext: Context): DataStore<UserPreferences> {
+            return DataStoreFactory.create(
+                serializer = UserPreferencesSerializer,
+                produceFile = { appContext.dataStoreFile(DATA_STORE_FILE_NAME) },
+                corruptionHandler = null,
+                scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+            )
+        }
     }
 }

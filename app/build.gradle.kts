@@ -1,12 +1,12 @@
 import com.android.build.api.dsl.ApplicationExtension
-import com.google.protobuf.gradle.id
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.protobuf)
     alias(libs.plugins.hilt.android)
 }
 
@@ -64,10 +64,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.kotlinx.coroutines.android)
 
-    //Datastore protobuf
+    //Datastore
     implementation(libs.androidx.datastore)
-    implementation(libs.protobuf.javalite)
-    implementation(libs.protobuf.kotlin.lite)
+    implementation(libs.kotlinx.serialization.json)
 
     //Hilt
     implementation(libs.hilt.android)
@@ -92,31 +91,4 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-}
-
-protobuf {
-    protoc {
-        artifact = "${libs.protobuf.compiler.get()}"
-    }
-    // Generates the java Protobuf-lite code for the Protobufs in this project. See
-    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
-    // for more information.
-    generateProtoTasks {
-        // see https://github.com/google/protobuf-gradle-plugin/issues/518
-        // see https://github.com/google/protobuf-gradle-plugin/issues/491
-        // all() here because of android multi-variant
-        all().forEach { task ->
-            // this only works on version 3.8+ that has buildins for javalite / kotlin lite
-            // with previous version the java build in is to be removed and a new plugin
-            // need to be declared
-            task.builtins {
-                id("java") { // id is imported above
-                    option("lite")
-                }
-                id("kotlin") {
-                    option("lite")
-                }
-            }
-        }
-    }
 }
