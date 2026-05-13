@@ -9,7 +9,7 @@ hilt = "2.59.2"
 # Dependency Versions
 coreKtx = "1.18.0"
 appcompat = "1.7.1"
-material = "1.13.0"
+material = "1.14.0"
 activity = "1.13.0"
 constraintlayout = "2.2.1"
 kotlinxCoroutinesAndroid = "1.11.0"
